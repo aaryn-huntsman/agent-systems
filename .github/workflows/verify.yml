@@ -1,0 +1,59 @@
+name: verify
+
+# Re-runs every demo's local verification battery on push:
+#  1. manual-retrieval evals (stdlib Python, exits non-zero on any failure)
+#  2. vector + find-it cross-checks (Node; the shipped rounded vectors must
+#     reproduce the Python pipelines' scored top-5 rankings exactly)
+#  3. a compile pass over all demo Python
+# The embedding pipelines themselves are NOT re-run in CI (they download a
+# model); their outputs are verified through the cross-checks instead.
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  manual-retrieval-evals:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Build sample DB and run evals
+        working-directory: demos/manual-retrieval-demo
+        run: |
+          python3 data/build_db.py
+          python3 evals/run_evals.py
+
+  shipped-data-crosschecks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - name: Vector demo cross-check
+        working-directory: demos/vector-rag-demo
+        run: node crosscheck.js
+      - name: Find-It demo cross-check
+        working-directory: demos/findit-demo
+        run: node crosscheck.js
+
+  python-compile:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Compile all demo Python
+        run: |
+          python3 -m py_compile \
+            demos/manual-retrieval-demo/retrieve.py \
+            demos/manual-retrieval-demo/data/build_db.py \
+            demos/manual-retrieval-demo/evals/run_evals.py \
+            demos/vector-rag-demo/chunk.py \
+            demos/vector-rag-demo/pipeline.py \
+            demos/findit-demo/dataset.py \
+            demos/findit-demo/pipeline.py
