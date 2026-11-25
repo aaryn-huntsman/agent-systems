@@ -1,0 +1,6 @@
+# Only needed to re-run the embedding pipelines (demos/vector-rag-demo,
+# demos/findit-demo) from scratch. The demos' verification batteries —
+# evals/run_evals.py and both crosscheck.js files — need nothing beyond
+# Python 3 / Node.
+numpy
+sentence-transformers

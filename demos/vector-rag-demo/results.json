@@ -1,0 +1,336 @@
+{
+ "meta": {
+  "model": "EmbeddingGemma 2 (google/embeddinggemma-2)",
+  "model_id": "google/embeddinggemma-2",
+  "full_dims": 768,
+  "dims": 256,
+  "truncation": "Matryoshka truncation: first 256 of 768 dims kept, then L2-renormalized.",
+  "prompts": "Model's built-in 'document'/'query' task prompts applied.",
+  "fallback": null
+ },
+ "questions": [
+  {
+   "q": "What should the card-price agent do when it finds no sales records for a card?",
+   "gold": [
+    "operation-manual-002"
+   ],
+   "vector_top5": [
+    {
+     "id": "operation-manual-001",
+     "score": 0.8033732401149587
+    },
+    {
+     "id": "operation-manual-000",
+     "score": 0.7965840622667854
+    },
+    {
+     "id": "operation-manual-002",
+     "score": 0.7780276360828631
+    },
+    {
+     "id": "operation-manual-005",
+     "score": 0.7643942599635045
+    },
+    {
+     "id": "operation-manual-003",
+     "score": 0.7177248034478595
+    }
+   ],
+   "vector_hit": true,
+   "structured_top5": [
+    "operation-manual-000"
+   ],
+   "structured_hit": false,
+   "structured_route": {
+    "section": [
+     "operation-manual",
+     "Operation Manual \u2014 Card-Price Research Agent"
+    ],
+    "score": 12
+   }
+  },
+  {
+   "q": "How is the percentage change for a price trend calculated?",
+   "gold": [
+    "operation-manual-003"
+   ],
+   "vector_top5": [
+    {
+     "id": "operation-manual-003",
+     "score": 0.7786669562824402
+    },
+    {
+     "id": "operation-manual-004",
+     "score": 0.7303642311300278
+    },
+    {
+     "id": "operation-manual-002",
+     "score": 0.6883939701748005
+    },
+    {
+     "id": "operation-manual-000",
+     "score": 0.6798862349855429
+    },
+    {
+     "id": "operation-manual-001",
+     "score": 0.656099404435279
+    }
+   ],
+   "vector_hit": true,
+   "structured_top5": [
+    "operation-manual-003"
+   ],
+   "structured_hit": true,
+   "structured_route": {
+    "section": [
+     "operation-manual",
+     "Analysis Steps"
+    ],
+    "score": 5
+   }
+  },
+  {
+   "q": "How does the series expert answer questions about a series without spoiling later books?",
+   "gold": [
+    "chewybits-series-expert-003"
+   ],
+   "vector_top5": [
+    {
+     "id": "chewybits-series-expert-001",
+     "score": 0.7665698720335403
+    },
+    {
+     "id": "chewybits-series-expert-013",
+     "score": 0.747352901789383
+    },
+    {
+     "id": "chewybits-series-expert-004",
+     "score": 0.7291640333685738
+    },
+    {
+     "id": "chewybits-series-expert-009",
+     "score": 0.7262094667339872
+    },
+    {
+     "id": "chewybits-series-expert-012",
+     "score": 0.7250636734899556
+    }
+   ],
+   "vector_hit": false,
+   "structured_top5": [
+    "chewybits-series-expert-000"
+   ],
+   "structured_hit": false,
+   "structured_route": {
+    "section": [
+     "chewybits-series-expert",
+     "ChewyBits Series Expert \u2014 manual.md"
+    ],
+    "score": 8
+   }
+  },
+  {
+   "q": "Can a wiki or other outside source ever count as verified against the books themselves?",
+   "gold": [
+    "chewybits-series-expert-012",
+    "chewybits-series-expert-014"
+   ],
+   "vector_top5": [
+    {
+     "id": "chewybits-series-expert-012",
+     "score": 0.8160079750084868
+    },
+    {
+     "id": "chewybits-series-expert-006",
+     "score": 0.8009473281616986
+    },
+    {
+     "id": "chewybits-series-expert-014",
+     "score": 0.7566322967978876
+    },
+    {
+     "id": "chewybits-series-expert-013",
+     "score": 0.7452257284320525
+    },
+    {
+     "id": "chewybits-series-expert-005",
+     "score": 0.7437623757535982
+    }
+   ],
+   "vector_hit": true,
+   "structured_top5": [
+    "chewybits-scriptwriter-001"
+   ],
+   "structured_hit": false,
+   "structured_route": {
+    "section": [
+     "chewybits-scriptwriter",
+     "Step 2 \u2014 Read the source packet"
+    ],
+    "score": 5
+   }
+  },
+  {
+   "q": "What does registering a business for A2P 10DLC texting involve?",
+   "gold": [
+    "rbm-service-delivery-002"
+   ],
+   "vector_top5": [
+    {
+     "id": "rbm-service-delivery-002",
+     "score": 0.855744468068705
+    },
+    {
+     "id": "rbm-service-delivery-001",
+     "score": 0.7978367578379801
+    },
+    {
+     "id": "rbm-service-delivery-004",
+     "score": 0.7365160875920221
+    },
+    {
+     "id": "rbm-service-delivery-007",
+     "score": 0.7106513118501816
+    },
+    {
+     "id": "rbm-service-delivery-003",
+     "score": 0.7082830060295151
+    }
+   ],
+   "vector_hit": true,
+   "structured_top5": [
+    "rbm-service-delivery-002"
+   ],
+   "structured_hit": true,
+   "structured_route": {
+    "section": [
+     "rbm-service-delivery",
+     "A.2 A2P 10DLC registration steps"
+    ],
+    "score": 10
+   }
+  },
+  {
+   "q": "When must a review reply be stopped and handed to a human instead of posted?",
+   "gold": [
+    "rbm-service-delivery-012"
+   ],
+   "vector_top5": [
+    {
+     "id": "rbm-service-delivery-012",
+     "score": 0.7553976782650438
+    },
+    {
+     "id": "rbm-service-delivery-008",
+     "score": 0.7547844645825692
+    },
+    {
+     "id": "rbm-service-delivery-010",
+     "score": 0.7498232442955228
+    },
+    {
+     "id": "rbm-service-delivery-009",
+     "score": 0.7472867213704614
+    },
+    {
+     "id": "operation-manual-005",
+     "score": 0.7369712803917704
+    }
+   ],
+   "vector_hit": true,
+   "structured_top5": [
+    "rbm-service-delivery-012"
+   ],
+   "structured_hit": true,
+   "structured_route": {
+    "section": [
+     "rbm-service-delivery",
+     "B.6 Sensitive-response human-review rule"
+    ],
+    "score": 8
+   }
+  },
+  {
+   "q": "What makes a good opening hook for a short video?",
+   "gold": [
+    "chewybits-scriptwriter-011"
+   ],
+   "vector_top5": [
+    {
+     "id": "chewybits-scriptwriter-011",
+     "score": 0.7721287491606239
+    },
+    {
+     "id": "chewybits-scriptwriter-009",
+     "score": 0.7580814444977267
+    },
+    {
+     "id": "chewybits-scriptwriter-002",
+     "score": 0.7374559617522429
+    },
+    {
+     "id": "chewybits-scriptwriter-014",
+     "score": 0.7370614143978492
+    },
+    {
+     "id": "chewybits-scriptwriter-012",
+     "score": 0.7316892773607493
+    }
+   ],
+   "vector_hit": true,
+   "structured_top5": [
+    "chewybits-scriptwriter-002"
+   ],
+   "structured_hit": false,
+   "structured_route": {
+    "section": [
+     "chewybits-scriptwriter",
+     "Step 3 \u2014 Select the single mechanic/hook"
+    ],
+    "score": 5
+   }
+  },
+  {
+   "q": "How are the Stripe payment links checked, and what result means the payment stage is healthy?",
+   "gold": [
+    "rbm-funnel-operator-003"
+   ],
+   "vector_top5": [
+    {
+     "id": "rbm-funnel-operator-003",
+     "score": 0.8266512147346415
+    },
+    {
+     "id": "rbm-funnel-operator-002",
+     "score": 0.768818134155608
+    },
+    {
+     "id": "rbm-funnel-operator-009",
+     "score": 0.7473119717097964
+    },
+    {
+     "id": "rbm-funnel-operator-004",
+     "score": 0.730333217204312
+    },
+    {
+     "id": "rbm-funnel-operator-005",
+     "score": 0.7080200186212884
+    }
+   ],
+   "vector_hit": true,
+   "structured_top5": [
+    "rbm-funnel-operator-003"
+   ],
+   "structured_hit": true,
+   "structured_route": {
+    "section": [
+     "rbm-funnel-operator",
+     "2. Stage check \u2014 PAYMENT (Stripe links, LIVEMODE, read-only)"
+    ],
+    "score": 17
+   }
+  }
+ ],
+ "vector_hit_at_5": "7/8",
+ "structured_hit_at_5": "4/8"
+}

@@ -1,0 +1,738 @@
+[
+ {
+  "id": "operation-manual-000",
+  "source": "operation-manual",
+  "heading": "Operation Manual \u2014 Card-Price Research Agent",
+  "heading_path": "Operation Manual \u2014 Card-Price Research Agent",
+  "text": "# Operation Manual \u2014 Card-Price Research Agent\n\nThis manual is the standing instruction set for the agent. It is the \"how\":\nit does not contain prices. Prices live in the database and are retrieved at\nrun time, per task. Sections are individually selectable by the retriever.",
+  "est_tokens": 60
+ },
+ {
+  "id": "operation-manual-001",
+  "source": "operation-manual",
+  "heading": "Role & Scope",
+  "heading_path": "Operation Manual \u2014 Card-Price Research Agent > Role & Scope",
+  "text": "## Role & Scope\n\nYou are a card-price research agent. Your job is to answer questions about\ncard prices using only the sales records retrieved for the current task.\nYou serve collectors and sellers who need a grounded read on what a card has\nactually sold for inside the provided dataset \u2014 nothing more, nothing less.\nStay inside the dataset. If a question falls outside price research on the\nretrieved records, say so instead of improvising an answer.",
+  "est_tokens": 101
+ },
+ {
+  "id": "operation-manual-002",
+  "source": "operation-manual",
+  "heading": "Data Rules",
+  "heading_path": "Operation Manual \u2014 Card-Price Research Agent > Data Rules",
+  "text": "## Data Rules\n\n- Only retrieved data may be cited. Every price, date, set name, condition,\n  and marketplace in your answer must come from a row retrieved for this task.\n- Never invent prices. Do not estimate, interpolate, round-trip from memory,\n  or fill gaps with plausible numbers. A missing value is reported as missing.\n- The database in this demo contains clearly synthetic sample data. Treat the\n  rows as the complete world for the task; do not present them as real market\n  prices.\n- Sort sales by sale_date before reasoning. The earliest retrieved sale and\n  the latest retrieved sale define the window for any trend statement.\n- If zero rows are retrieved for a card, the correct answer is that no data\n  was retrieved for that card. Full stop.",
+  "est_tokens": 168
+ },
+ {
+  "id": "operation-manual-003",
+  "source": "operation-manual",
+  "heading": "Analysis Steps",
+  "heading_path": "Operation Manual \u2014 Card-Price Research Agent > Analysis Steps",
+  "text": "## Analysis Steps\n\n1. Confirm which cards the task names, and use exactly the rows retrieved for\n   those cards.\n2. For a trend: order the sales by date, take the first and latest sale, and\n   compute the percentage change as (latest - first) / first * 100. Report\n   the sale count and the date range alongside it.\n3. For a comparison: compute each card's figures separately first (sale\n   count, date range, first and latest sale, average), then compare the\n   latest retrieved prices. State the difference in dollars and as a\n   percentage relative to the second card's latest price.\n4. For a lookup: report the single latest retrieved sale only \u2014 its price,\n   date, set, condition, and marketplace.\n5. Do the arithmetic in code, not in prose. Report computed values exactly as\n   calculated, to two decimal places.",
+  "est_tokens": 177
+ },
+ {
+  "id": "operation-manual-004",
+  "source": "operation-manual",
+  "heading": "Output Format",
+  "heading_path": "Operation Manual \u2014 Card-Price Research Agent > Output Format",
+  "text": "## Output Format\n\nAnswer in plain text, using these labels:\n\n- One block per card, headed by the card name.\n- \"Retrieved sales:\" followed by the count of rows used.\n- \"Date range:\" earliest and latest sale dates, when more than one sale.\n- \"First retrieved sale:\" and \"Latest retrieved sale:\" with price, date,\n  set, condition, and marketplace.\n- \"Change:\" the computed percentage change with the first and latest prices\n  shown, for trend answers.\n- \"Basis:\" one closing line stating that the answer was computed only from\n  the retrieved rows.\n\nFor a no-data card, the entire block is the single sentence: \"No data was\nretrieved for <card>.\" \u2014 followed by the Basis line.",
+  "est_tokens": 147
+ },
+ {
+  "id": "operation-manual-005",
+  "source": "operation-manual",
+  "heading": "Guardrails",
+  "heading_path": "Operation Manual \u2014 Card-Price Research Agent > Guardrails",
+  "text": "## Guardrails\n\n- Never state a price, trend, or comparison for a card with no retrieved\n  rows.\n- Never compare a card against a card with no retrieved rows; report the\n  missing side instead.\n- Never blend conditions, sets, or marketplaces into a claim the rows do not\n  support; describe the records as they are.\n- Never present the synthetic sample data in this demo as real market data.\n- If the retrieved rows are ambiguous or contradictory, surface the ambiguity\n  rather than resolving it silently.",
+  "est_tokens": 112
+ },
+ {
+  "id": "chewybits-series-expert-000",
+  "source": "chewybits-series-expert",
+  "heading": "ChewyBits Series Expert \u2014 manual.md",
+  "heading_path": "ChewyBits Series Expert \u2014 manual.md",
+  "text": "# ChewyBits Series Expert \u2014 manual.md\n\n_Wins on procedure. If this file and prompt.md disagree on how to do something, this file wins._",
+  "est_tokens": 30
+ },
+ {
+  "id": "chewybits-series-expert-001",
+  "source": "chewybits-series-expert",
+  "heading": "0. Pre-run",
+  "heading_path": "ChewyBits Series Expert \u2014 manual.md > 0. Pre-run",
+  "text": "## 0. Pre-run\n\nRead, in order: `prompt.md`, this `manual.md`, `knowledge.md` (all in `~/agents/chewybits-series-expert/`).\nConfirm the research brief contains: topic, series (vault slug), audience book position N (integer), founder-facing or audience-facing.\nIf any of the four is missing, stop \u2192 ask the parent. Never guess a spoiler boundary.",
+  "est_tokens": 61
+ },
+ {
+  "id": "chewybits-series-expert-002",
+  "source": "chewybits-series-expert",
+  "heading": "1. Resolve the series",
+  "heading_path": "ChewyBits Series Expert \u2014 manual.md > 1. Resolve the series",
+  "text": "## 1. Resolve the series\n\n- Vault path: `~/chewybits/vaults/series/<slug>/` (index: `~/chewybits/vaults/README.md`).\n- Series id in lore.db: `sqlite3 ~/chewybits/lore.db \"SELECT id, title, reading_status FROM series;\"` \u2014 match slug to title, record the id. If the series is absent, log \"DB gap \u2014 markdown only\" and skip steps 2\u20134 (expected-absence, not an error).",
+  "est_tokens": 66
+ },
+ {
+  "id": "chewybits-series-expert-003",
+  "source": "chewybits-series-expert",
+  "heading": "2. Query the lore DB (spoiler-quarantined)",
+  "heading_path": "ChewyBits Series Expert \u2014 manual.md > 2. Query the lore DB (spoiler-quarantined)",
+  "text": "## 2. Query the lore DB (spoiler-quarantined)\n\nDB path: `~/chewybits/lore.db`. Always substitute the series id and N.\n\n**2a. Safe rows (full content safe at book N):**\n```sql\nSELECT book, chapter, story_order, event_title, known_then, later_revelations, spoiler_through_book\nFROM story_timeline\nWHERE series_id = ? AND spoiler_through_book <= N\nORDER BY book, story_order;\n```\n\n**2b. Quarantined rows (events at/before N, revelations later \u2014 read `known_then` ONLY):**\n```sql\nSELECT book, chapter, event_title, known_then, spoiler_through_book\nFROM story_timeline\nWHERE series_id = ? AND book <= N AND spoiler_through_book > N\nORDER BY book, story_order;\n```\nRedact `later_revelations` in audience-facing packets. For founder-facing briefs, include it labeled `[FOUNDER-FACING SPOILER]`.\n\n**2c. Foundations (six typed tables):**\n```sql\nSELECT 'power_systems' t, name, acquisition, cost, expression, limits, confidence, source_ref FROM power_systems WHERE series_id = ?\nUNION ALL SELECT 'cosmology', aspect, description, NULL, NULL, NULL, confidence, source_ref FROM cosmology WHERE series_id = ?\nUNION ALL SELECT 'factions', name, kind, description, NULL, NULL, confidence, source_ref FROM factions WHERE series_id = ?\nUNION ALL SELECT 'cultures', name, kind, description, NULL, NULL, confidence, source_ref FROM cultures WHERE series_id = ?\nUNION ALL SELECT 'history_events', era, event, description, NULL, NULL, confidence, source_ref FROM history_events WHERE series_id = ?\nUNION ALL SELECT 'themes', theme, description, NULL, NULL, NULL, confidence, source_ref FROM themes WHERE series_id = ?;\n```\n\n**2d. Characters (narrative_function first \u2014 scriptwriters query this column first):**\n```sql\nSELECT c.name, c.species, c.role, c.narrative_function, c.confidence, c.source_ref\nFROM characters c WHERE c.series_id = ? ORDER BY c.name;\n```\nArcs/traits/quotes per character:\n```sql\nSELECT c.name, a.book, a.arc_summary, a.world_link, a.confidence\nFROM character_arcs a JOIN characters c ON c.id = a.character_id\nWHERE c.series_id = ? AND CAST(a.book AS INTEGER) <= N ORDER BY c.name, a.book;\n```\n`CAST(book AS INTEGER)` \u2014 book columns are TEXT references; guard with `a.book NOT GLOB '*[^0-9]*'` if non-numeric values appear.",
+  "est_tokens": 380
+ },
+ {
+  "id": "chewybits-series-expert-004",
+  "source": "chewybits-series-expert",
+  "heading": "2. Query the lore DB (spoiler-quarantined)",
+  "heading_path": "ChewyBits Series Expert \u2014 manual.md > 2. Query the lore DB (spoiler-quarantined)",
+  "text": "## 2. Query the lore DB (spoiler-quarantined)\n\n**2e. Relationship graph (check both directions \u2014 symmetric types stored once per pair):**\n```sql\nSELECT c1.name AS a, r.rel_type, c2.name AS b, r.description, r.book_from, r.book_to, r.confidence\nFROM relationships r\nJOIN characters c1 ON c1.id = r.char_a_id\nJOIN characters c2 ON c2.id = r.char_b_id\nWHERE (c1.series_id = ? OR c2.series_id = ?)\n  AND (r.book_to IS NULL OR CAST(r.book_to AS INTEGER) >= N);\n```\nTime-scope: `book_from`/`book_to`; NULL `book_to` = still current. Same bond can repeat across periods (mentor \u2192 ally).\n\n**2f. Temporal power layer:**\n```sql\nSELECT book, era_label, title, summary, key_shifts\nFROM power_timeline WHERE series_id = ? ORDER BY id;\nSELECT f.name, fp.book, fp.rank, fp.notes, fp.confidence\nFROM faction_power fp JOIN factions f ON f.id = fp.faction_id\nWHERE f.series_id = ? ORDER BY f.name, fp.book;\n```\n`rank='unknown'` + `confidence='VERIFY'` means the founder's read-through hasn't filled that era \u2014 never treat it as \"nothing happened.\"\n\n**2g. Provenance:**\n```sql\nSELECT code, url, kind, tier, coverage FROM sources WHERE series_id = ?;\n```",
+  "est_tokens": 213
+ },
+ {
+  "id": "chewybits-series-expert-005",
+  "source": "chewybits-series-expert",
+  "heading": "3. Read the markdown vaults",
+  "heading_path": "ChewyBits Series Expert \u2014 manual.md > 3. Read the markdown vaults",
+  "text": "## 3. Read the markdown vaults\n\n- Read `~/chewybits/vaults/series/<slug>/knowledge.md` \u2014 the human truth-pass layer. Any FOUNDER-verified fact here outranks the DB; copy it at FOUNDER tier.\n- Read `~/chewybits/vaults/series/<slug>/research.md` \u2014 verification log; note open [VERIFY] items and sources still to check.\n- Read `power-dynamics.md` first if the brief touches faction/power movement (SCHEMA doctrine: read the essay before the tables).\n- Note the `[VERIFY]` tag convention: inline `[VERIFY: <reason>]` after uncertain claims; founder's read-through is the resolution path (he has read HWFWM book 8, is caught up on DCC).",
+  "est_tokens": 114
+ },
+ {
+  "id": "chewybits-series-expert-006",
+  "source": "chewybits-series-expert",
+  "heading": "4. Branch decisions (explicit)",
+  "heading_path": "ChewyBits Series Expert \u2014 manual.md > 4. Branch decisions (explicit)",
+  "text": "## 4. Branch decisions (explicit)\n\n- **TEXT vs WIKI conflict \u2192 TEXT wins.** Record the losing WIKI claim in \"What NOT to claim.\"\n- **FOUNDER vs everything \u2192 FOUNDER wins**, including over TEXT. Founder-verified = canon for all derivatives.\n- **Only VERIFY exists \u2192** flag prominently as an open item; never present it as fact; never smooth over.\n- **Wiki marks something as rumor \u2192** downgrade one tier (WIKI \u2192 SECONDARY) and tag [VERIFY] with the wiki's own caveat.\n- **Latest-book material (e.g., DCC Book 8 aftermaths) \u2192** recorded thin and labeled \"latest published book \u2014 downstream consequences not yet written\"; absence of later revelations on the latest book is data, not a gap.",
+  "est_tokens": 148
+ },
+ {
+  "id": "chewybits-series-expert-007",
+  "source": "chewybits-series-expert",
+  "heading": "5. Assemble the packet",
+  "heading_path": "ChewyBits Series Expert \u2014 manual.md > 5. Assemble the packet",
+  "text": "## 5. Assemble the packet\n\nWrite to `~/chewybits/vaults/series/<slug>/content/research-packets/<topic-slug>.md` (mkdir -p first).\nFollow the verbatim template in prompt.md \u00a76. Rules:\n- One bullet per claim; each bullet opens with `[TIER]` and ends with `Source: <source_ref>`.\n- Claims below TEXT (WIKI/SECONDARY/VERIFY) are grouped under a \"Fragile \u2014 verify before use\" subheading.\n- \"What NOT to claim\" includes: losing side of resolved conflicts, common fan errors, spoiler-risky phrasings for audience-facing packets.\n- Hooks written in the series' tonal vibe (e.g., DCC: dark comedy + genuine stakes), in-world expert POV, no meta math-speak.\n- Audience-facing packet \u2192 spoiler quarantine enforced; founder-facing packet \u2192 include `later_revelations` labeled `[FOUNDER-FACING SPOILER]`.\n\n## 6. Record\n\n- Append new findings to the series' `research.md` (notes only \u2014 never edit `knowledge.md`).\n- Append one run line to `~/agents/chewybits-series-expert/learnings.md` in the header's format.\n\n## 7. Hand off\n\nFinal message reports: packet path, claim counts per tier, open [VERIFY] count, anything the scriptwriter must know. No outreach, no external sends.\n\n---",
+  "est_tokens": 207
+ },
+ {
+  "id": "chewybits-series-expert-008",
+  "source": "chewybits-series-expert",
+  "heading": "8. Comp-analysis packet format \u2014 Launch Intel (approved 2026-10-02 \u2014 staging only)",
+  "heading_path": "ChewyBits Series Expert \u2014 manual.md > 8. Comp-analysis packet format \u2014 Launch Intel (approved 2026-10-02 \u2014 staging only)",
+  "text": "## 8. Comp-analysis packet format \u2014 Launch Intel (approved 2026-10-02 \u2014 staging only)\n\nCommissioned by `chewybits-docket-builder` \u00a77. The packet is author-facing (the launching author is the reader), so: no spoilers of the author's own manuscript (unknown to us), industry framing, every section actionable.\n\nSections, in order:\n1. **Comp titles.** 5\u20138 titles closest to the prospect's manuscript: title/author, subgenre fit, 1\u20132 lines on WHY it comps (mechanics, tropes, tone \u2014 not vibes). Each entry tier-sourced.\n2. **Trope/mechanics trends.** What's saturated (avoid or twist), what's rising, what's underserved in the prospect's subgenre \u2014 each trend with \u22652 sourced examples, tiered.\n3. **Royal Road \u2192 KU positioning.** If the author has a Royal Road path: how similar titles converted (readership signals, timing, blurb/cover patterns). If KU-direct: what launch-week mechanics matter (also-boughts, category targeting, rapid-release cadence). Platform-mechanic claims at SECONDARY minimum \u2014 never VERIFY-as-fact.\n4. **Launch checklist.** Sequenced, dated actions from manuscript-final through launch week + 30 days: concrete steps, owner per step (author vs us), what success looks like per step.\n5. **What NOT to claim.** No sales projections, no \"guaranteed bestseller\" language, no promises about Amazon's algorithms. These are hard fails \u2014 same class as \u00a74 rights-gate failures: stop, fix or rebuild, never stage.\n\nAll claims tiered per the canonical hierarchy; the \"Fragile \u2014 verify before use\" rule from \u00a75 applies unchanged.",
+  "est_tokens": 286
+ },
+ {
+  "id": "chewybits-series-expert-009",
+  "source": "chewybits-series-expert",
+  "heading": "9. Bible schema v1 assembly procedure (approved 2026-10-02 \u2014 staging only)",
+  "heading_path": "ChewyBits Series Expert \u2014 manual.md > 9. Bible schema v1 assembly procedure (approved 2026-10-02 \u2014 staging only)",
+  "text": "## 9. Bible schema v1 assembly procedure (approved 2026-10-02 \u2014 staging only)\n\nA series bible is [redacted \u2014 internal product strategy]. This is the v1 build procedure \u2014 one bible per series, curated by the expert, truth-passed by Aaryn.\n\nBuild order, all layers:\n1. **Dossiers.** Per major character: personality, physical features, movement, style, preferences, habits, identity, political affiliations, family-tree links, power distribution. Every field tiered.\n2. **Mechanics.** Power systems, cosmology, factions, cultures, history events, themes \u2014 pulled from the lore DB foundation tables where loaded, tiered per claim.\n3. **Spoiler-quarantined timeline.** Full `known_then` vs `later_revelations` timeline held internally, tagged `spoiler_through_book`; any excerpt shipped to a buyer is cut at the buyer's book position.\n4. **Sourced quotes.** Short, attributed, necessary \u2014 same rights discipline as docket-builder \u00a74: never reproduce extended copyrighted prose, panels, or scripts.\n5. **Relationships graph.** Character\u2192character edges with book_from/book_to scoping; time-scoped faction membership where applicable.\n6. **Per-book arcs.** One arc summary per book per major character, tiered.\n7. **Pronunciation/audio notes.** Name pronunciations and voice-casting notes for TTS/VO \u2014 feeds the audio pipeline.\n8. **QA pass.** Full claims re-tier, spoiler-quarantine audit, rights gate (same 8 checks as docket-builder \u00a74), then Aaryn's truth pass. QA pass rate is logged by `metrics-keeper` (its \u00a76): a bible ships only at the bar set in the bible product spec.\n\nStaging: bible drafts live in the ChewyBits products vault (`~/vaults/chewybits/products/` \u2014 being built in parallel); the expert writes the draft, Aaryn truth-passes, then it's staged as a product asset. Bible claims in future dockets carry the BIBLE tier (see docket-builder \u00a78).\n\n## 10. Soul firewall \u2014 feeling vs. claim (soul-signal intake)\n\nWhen the pulse-scout files soul-signal notes (scout manual \u00a78), process each item through this firewall before anything touches a series' `essence.md`. Wrong fundamental info never reaches the soul.",
+  "est_tokens": 384
+ },
+ {
+  "id": "chewybits-series-expert-010",
+  "source": "chewybits-series-expert",
+  "heading": "10. Soul firewall \u2014 feeling vs. claim (soul-signal intake)",
+  "heading_path": "ChewyBits Series Expert \u2014 manual.md > 10. Soul firewall \u2014 feeling vs. claim (soul-signal intake)",
+  "text": "## 10. Soul firewall \u2014 feeling vs. claim (soul-signal intake)\n\n1. **Split feeling from claim.** Every testimony item has two layers:\n   - **Feeling** (subjective): what the series did to the witness \u2014 the scene that wrecked them, what the series means to them. Admitted as testimony, carrying the scout's witness weight. Feelings are true as reported experience; they need no text verification. - **Embedded claims** (factual): any assertion about *what happened in the text* that the feeling rests on (\"the nuance was X when Y happened\"). Check each claim against the source hierarchy FOUNDER > BIBLE > TEXT > WIKI > SECONDARY > VERIFY (\u00a74 branch rules apply unchanged). 2. **Stamp every claim \u2014 three stamps only:**\n   - **VERIFIED:** the claim holds at TEXT tier or above \u2192 the testimony may enter the essence file with its witness weight. - **UNVERIFIABLE:** the claim can't be checked \u2192 the feeling is still admitted, but the claim is STRIPPED or explicitly labeled `[UNVERIFIED CLAIM]` in the record. Never smuggled in as fact. - **CONTRADICTED:** the text says otherwise \u2192 rejected from the essence file, with a note. Flag it to the brief layer as a content opportunity (e.g. \"the popular reading the text doesn't support\" \u2014 an engaging topic, not soul material). - External-corroboration protocol (\u00a711) strengthens claims that never reach TEXT \u2014 but externally corroborated is never TEXT-verified, and the label must say so. 3. **Fan theories live on a labeled shelf at the brief layer only.** \"Theories the community holds\" are genuinely engaging topics \u2014 file them as brief fodder, never as essence. The soul contains what the series *is*; the brief layer may play with what fans *wonder*. 4.",
+  "est_tokens": 364
+ },
+ {
+  "id": "chewybits-series-expert-011",
+  "source": "chewybits-series-expert",
+  "heading": "10. Soul firewall \u2014 feeling vs. claim (soul-signal intake)",
+  "heading_path": "ChewyBits Series Expert \u2014 manual.md > 10. Soul firewall \u2014 feeling vs. claim (soul-signal intake)",
+  "text": "**The essence.md section template \u2014 \"What the community carries.\"** When admitted testimony is written into a series' `essence.md`, it goes in this clearly separated section, never blended into the core essence:\n   - One entry per admitted testimony item: the feeling, the witness weight, the community/name source, the evidence label, and the VERIFIED claim stamps behind it. - The file must stay honest about what's ours (the unapologetic core essence) versus what's witnessed (this section). - Aaryn's soul-check remains the final gate on the whole file \u2014 admitted testimony included. 5. **Known thin tier.** TEXT means claims verifiable against the published text. Aaryn absorbed the series via audiobook and has recused himself as verbatim verifier (2026-10-07) \u2014 you cannot Ctrl-F an audiobook, and a verifier who cannot verify is a rubber stamp. His authority remains where the medium supports it: soul-check, thematic judgment, and final gate on essence \u2014 interpretive roles, not transcription. Full book text is NOT in the agent vaults. Until licensed/searchable text exists, book-only claims sit at VERIFY \u2014 never presented as verified. Legitimate personal-use search (e.g. Kindle search inside a purchased copy) is fine for human verification; extracting text into the vault is not.",
+  "est_tokens": 256
+ },
+ {
+  "id": "chewybits-series-expert-012",
+  "source": "chewybits-series-expert",
+  "heading": "11. External-corroboration protocol (no licensed text, no founder-text tier)",
+  "heading_path": "ChewyBits Series Expert \u2014 manual.md > 11. External-corroboration protocol (no licensed text, no founder-text tier)",
+  "text": "## 11. External-corroboration protocol (no licensed text, no founder-text tier)\n\nThe TEXT tier is thin: Aaryn absorbed the series via audiobook and recused himself as verbatim verifier (\u00a710.5), and full book text never enters the vaults. This protocol is the bridge until a licensed reference copy exists. It cannot produce a VERIFIED stamp alone \u2014 its outputs feed the \u00a710 firewall as \"externally corroborated (strong),\" one rung below TEXT. Run layers in strength order; stop when the claim is settled or flagged.",
+  "est_tokens": 107
+ },
+ {
+  "id": "chewybits-series-expert-013",
+  "source": "chewybits-series-expert",
+  "heading": "11. External-corroboration protocol (no licensed text, no founder-text tier)",
+  "heading_path": "ChewyBits Series Expert \u2014 manual.md > 11. External-corroboration protocol (no licensed text, no founder-text tier)",
+  "text": "## 11. External-corroboration protocol (no licensed text, no founder-text tier)\n\n1. **Exact-phrase quote search.** Put the alleged quote in quotation marks and search it verbatim. Fabricated quotes return nothing; real ones surface on wiki quote pages, Reddit threads, Goodreads reviews. Fast, and it catches hallucinated dialogue cold. A hit proves the phrase circulates \u2014 corroboration, not TEXT.\n2. **Wiki + chapter summaries.** The series wikis (HWFWM, DCC) are actively maintained with cited chapter references. Strong for structural claims \u2014 who did what, in what chapter. Note the wiki's own hedging: where the wiki hedges (\"most likely\"), the claim inherits the hedge, never upgrades past it.\n3. **Google Books snippet search.** Full-text search over the published books with snippet views \u2014 the quiet superpower. Confirms or denies a specific phrase against the *published text* without possessing it. Publisher's own preview infrastructure doing our verification for us.\n4. **Royal Road originals (HWFWM).** Early HWFWM books were a free web serial; that text is publicly readable. An agent may read claims against the serial chapters \u2014 real source text, read not stored. Caveat: books were edited after serialization, so version gaps get flagged as version gaps, not silently merged.\n5. **Triangulation.** Wiki + Reddit + reviews + interviews independently agreeing promotes a claim to \"externally corroborated (strong).\" One source echoing another is not independence \u2014 look for distinct witnesses.\n6. **Break-glass.** A purchased Kindle copy's built-in search for settling high-stakes claims. Legitimate personal use, cheap, no extraction. Search happens inside the copy; nothing leaves it.",
+  "est_tokens": 328
+ },
+ {
+  "id": "chewybits-series-expert-014",
+  "source": "chewybits-series-expert",
+  "heading": "11. External-corroboration protocol (no licensed text, no founder-text tier)",
+  "heading_path": "ChewyBits Series Expert \u2014 manual.md > 11. External-corroboration protocol (no licensed text, no founder-text tier)",
+  "text": "## 11. External-corroboration protocol (no licensed text, no founder-text tier)\n\n**Honest labeling stays mandatory.** \"Externally corroborated\" is never presented as \"TEXT-verified\" in the essence file, the staged resonance pass, or the brief. The \u00a710 firewall keeps the distinction; this protocol just makes the corroboration rigorous. The actual fix remains the licensing play (\u00a710.5); this is the bridge until then.",
+  "est_tokens": 77
+ },
+ {
+  "id": "rbm-service-delivery-000",
+  "source": "rbm-service-delivery",
+  "heading": "rbm-service-delivery \u2014 manual.md",
+  "heading_path": "rbm-service-delivery \u2014 manual.md",
+  "text": "# rbm-service-delivery \u2014 manual.md\n\nExecutable procedure. `prompt.md` is the contract; this file wins on procedure, the prompt wins on boundaries. Deltas-only: funnel/audit doctrine lives in `funnel-operator/manual.md` and is never duplicated here. Everything below is delivery-lane procedure for RBM's two approved managed products.\n\n**Prerequisite for any client build:** Aaryn's per-client go-ahead for provisioning, plus setup-fee payment matched read-only via `rbm-payment-watch` records (intake-first funnel; 48h delivery clock starts at confirmed payment \u2014 same settled rule as the teardown line). Client state file: `state/<client-slug>.md`. Staging dir: `state/<client-slug>/`.\n\n---\n\n## \u00a7A \u2014 Missed-Call Rescue runbook\n\nProduct: done-for-you missed-call text-back for local service businesses. Pricing: **[redacted \u2014 unreleased offer pricing]**.",
+  "est_tokens": 136
+ },
+ {
+  "id": "rbm-service-delivery-001",
+  "source": "rbm-service-delivery",
+  "heading": "A.1 Provisioning checklist",
+  "heading_path": "rbm-service-delivery \u2014 manual.md > \u00a7A \u2014 Missed-Call Rescue runbook > A.1 Provisioning checklist",
+  "text": "### A.1 Provisioning checklist\n\nExecute in order. Mark each with PASS + timestamp in the client state file. No live action before Aaryn's per-client go-ahead (prompt \u00a74).\n\n1. **Client record.** Create `state/<client-slug>.md`: business name, contact name/email, primary business number, timezone, intake ID, setup tier ([redacted \u2014 unreleased offer pricing]), payment-match reference (charge ID + date from payment-watch records).\n2. **Vendor selection (FIRST BUILD ONLY \u2014 Aaryn-gated).** Present Aaryn a scored recommendation per `knowledge.md` \u00a7Vendor criteria; he picks the stack. Subsequent builds reuse the stack unless Aaryn says otherwise. Record the choice + date.\n3. **Number provisioning.** Acquire a dedicated SMS-capable number for the client through the approved vendor (staging: prepare the vendor-side config; live: execute only on Aaryn's go-ahead). Record the number + vendor account reference.\n4. **A2P 10DLC registration.** Prepare the brand + campaign registration packet per A.2. Submit only on Aaryn's per-client go-ahead. Record brand ID + campaign ID + approval status.\n5. **Flow build.** Design the missed-call \u2192 text-back flow per A.3 (staging artifact: flow diagram + exact message copy in `state/<client-slug>/flow.md`).\n6. **STOP/HELP verification.** Confirm STOP/HELP keywords are handled on the flow (required on every flow; see knowledge.md compliance notes).\n7. **Live verification.** Execute A.4 live test-call/text verification ONLY after A2P campaign is APPROVED. Both legs must pass.\n8. **Go-live checklist.** Complete A.5; only then mark `STAGE: LIVE`.",
+  "est_tokens": 289
+ },
+ {
+  "id": "rbm-service-delivery-002",
+  "source": "rbm-service-delivery",
+  "heading": "A.2 A2P 10DLC registration steps",
+  "heading_path": "rbm-service-delivery \u2014 manual.md > \u00a7A \u2014 Missed-Call Rescue runbook > A.2 A2P 10DLC registration steps",
+  "text": "### A.2 A2P 10DLC registration steps\n\nCompliance specifics are VERIFY-dated in `knowledge.md` \u2014 confirm current requirements against the vendor's registration portal before each build; do not rely on memory.\n\n1. **Brand registration:** register the client's business as a brand (business legal name, EIN/tax ID as the vendor requires, business address, contact details). Staging: assemble the data packet; live: submit on Aaryn's go-ahead. Record brand ID.\n2. **Campaign registration:** register the missed-call text-back use case (campaign description: \"missed-call follow-up \u2014 transactional/operational text to callers who attempted to reach the business\"; sample messages: the exact flow copy from A.3; opt-in basis: \"callers who called the business number and did not connect \u2014 implied/requested contact context\"; opt-out handling: STOP/HELP). Record campaign ID.\n3. **Approval gate:** campaign status must read APPROVED before any outbound client text (including test texts to the client's own number). PENDING = all client texting stays blocked.\n4. **Attribution:** link the approved campaign to the client's provisioned number. Record number \u2194 campaign mapping.",
+  "est_tokens": 212
+ },
+ {
+  "id": "rbm-service-delivery-003",
+  "source": "rbm-service-delivery",
+  "heading": "A.3 Flow design",
+  "heading_path": "rbm-service-delivery \u2014 manual.md > \u00a7A \u2014 Missed-Call Rescue runbook > A.3 Flow design",
+  "text": "### A.3 Flow design\n\nDeliverable: `state/<client-slug>/flow.md` with: trigger, timing, exact message copy, branching logic, escalation rules. Draft only \u2014 every client-facing message needs Aaryn's per-send approval before first live use.\n\n- **Trigger:** inbound call to the client's business number that goes unanswered (missed-call detection per vendor).\n- **Timing:** text-back within the vendor's fastest reliable window (specify exact delay in flow.md; keep it under 5 minutes).\n- **Message 1 (immediate):** identify the business, acknowledge the missed call, offer next step. Copy must name the business, be conversational (RBM brand voice: helpful automation, not hype), and include opt-out language per campaign registration. Template:\n  > `Hi, this is <Business> \u2014 sorry we missed your call. What's the best way to help you? (Reply STOP to opt out.)`\n- **Branching:** if the caller replies \u2192 route to the booking/next-step sequence defined in flow.md (business-specific: schedule a service call, leave details, call back). If no reply \u2192 one follow-up text after the client-defined window (never more than 2 unanswered texts per missed call).\n- **Escalation:** replies the flow can't handle (complex quotes, complaints, emergencies) \u2192 flagged to the client per the client's chosen channel (SMS to owner / email), logged in the weekly report.\n- **Hard rules:** no texting without APPROVED campaign; no more than 2 outbound texts per missed call without a reply; never text outside the client's stated business hours unless the client explicitly approves after-hours coverage.",
+  "est_tokens": 304
+ },
+ {
+  "id": "rbm-service-delivery-004",
+  "source": "rbm-service-delivery",
+  "heading": "A.4 Live test-call/text verification",
+  "heading_path": "rbm-service-delivery \u2014 manual.md > \u00a7A \u2014 Missed-Call Rescue runbook > A.4 Live test-call/text verification",
+  "text": "### A.4 Live test-call/text verification\n\nRun ONLY after A2P campaign = APPROVED and Aaryn's per-client go-ahead. Two legs, both must PASS:\n\n- **Leg 1 \u2014 missed-call trigger:** place a test call to the business number, let it ring unanswered. Confirm the missed-call trigger fires in the vendor log within 2 minutes. Record: timestamp, trigger log reference.\n- **Leg 2 \u2014 text-back receipt:** confirm the text-back arrives on the test handset within the flow's stated window. Confirm message copy matches the approved flow.md exactly. Confirm STOP/HELP replies are handled (send STOP from the test handset; confirm opt-out recorded). Record: timestamps, exact message received.\n\nIf either leg fails: `STAGE: BLOCKED`, log the failing leg + vendor log reference + timestamp, report to Aaryn with the remediation proposal. Never declare live on partial verification.",
+  "est_tokens": 170
+ },
+ {
+  "id": "rbm-service-delivery-005",
+  "source": "rbm-service-delivery",
+  "heading": "A.5 Go-live checklist",
+  "heading_path": "rbm-service-delivery \u2014 manual.md > \u00a7A \u2014 Missed-Call Rescue runbook > A.5 Go-live checklist",
+  "text": "### A.5 Go-live checklist\n\nAll must be PASS before `STAGE: LIVE`:\n\n- [ ] Number provisioned and recorded (number + vendor reference)\n- [ ] Brand + campaign APPROVED (IDs recorded)\n- [ ] Flow built and matches approved copy (flow.md committed)\n- [ ] Test call leg PASS (timestamp + log ref)\n- [ ] Test text leg PASS (timestamp, exact copy verified, STOP/HELP confirmed)\n- [ ] Client notification: client informed of go-live date + what to expect (draft prepared; sent only with Aaryn's per-send approval)\n- [ ] Weekly report cadence armed (report day set, metrics defined per A.6)",
+  "est_tokens": 133
+ },
+ {
+  "id": "rbm-service-delivery-006",
+  "source": "rbm-service-delivery",
+  "heading": "A.6 Weekly managed report format",
+  "heading_path": "rbm-service-delivery \u2014 manual.md > \u00a7A \u2014 Missed-Call Rescue runbook > A.6 Weekly managed report format",
+  "text": "### A.6 Weekly managed report format\n\nWeekly report per client. Numbers only \u2014 verified from the vendor's log, never estimated. Fed to `metrics-keeper` as raw facts (counts + dates).\n\n```\nMISSED-CALL RESCUE \u2014 <client> \u2014 week of <Mon date>\nCALLS CAUGHT: <n> missed calls detected\nTEXTS SENT: <n> (\u22642 per missed call rule)\nREPLIES: <n> caller replies\nJOBS BOOKED: <n> confirmed bookings / service appointments\nESCALATED: <n> replies handed to client \u2014 <one line each>\nNOTES: <anything material, one line each>\nSTATUS: ON-TRACK | ATTENTION \u2014 <why, if attention>\n```\n\n\"Jobs booked\" counts only confirmed bookings/appointments the client verifies (never assume a reply = a booking). First report ships the week after go-live.\n\n---\n\n## \u00a7B \u2014 Review Engine runbook\n\nProduct: review generation + response system \u2014 setup + monthly managed. Pricing: **[redacted \u2014 unreleased offer pricing]**.",
+  "est_tokens": 178
+ },
+ {
+  "id": "rbm-service-delivery-007",
+  "source": "rbm-service-delivery",
+  "heading": "B.1 Setup checklist",
+  "heading_path": "rbm-service-delivery \u2014 manual.md > \u00a7B \u2014 Review Engine runbook > B.1 Setup checklist",
+  "text": "### B.1 Setup checklist\n\n1. **Client record.** Create `state/<client-slug>.md`: business name, Google Business Profile (GBP) URL, review-platform scope (GBP primary; others only if the client approves), intake ID, setup tier ([redacted \u2014 unreleased offer pricing]), payment-match reference.\n2. **Profile audit.** Read-only review of the client's GBP: current rating, review count, unanswered reviews, obvious issues (wrong hours, no review link). Record the baseline: rating + count + date. Never modify the client's GBP.\n3. **Review-request sequence design.** Draft the request cadence per B.2: timing, exact copy, delivery channel (SMS via A2P-registered number \u2014 requires an approved campaign per A.2 rules; or email via the client's sender identity). All client-facing text needs Aaryn's per-send approval.\n4. **Response system.** Draft the response procedure per B.3 + tone rubric per B.4.\n5. **Approval gate.** Aaryn approves the cadence, all message copy, and the response rules before anything goes live (per-send approval covers the client-facing text; the procedure itself is approved as a plan).\n6. **Baseline snapshot.** Record rating + count + unanswered count + date in the client state file. This is the velocity denominator.",
+  "est_tokens": 235
+ },
+ {
+  "id": "rbm-service-delivery-008",
+  "source": "rbm-service-delivery",
+  "heading": "B.2 Review-request cadence",
+  "heading_path": "rbm-service-delivery \u2014 manual.md > \u00a7B \u2014 Review Engine runbook > B.2 Review-request cadence",
+  "text": "### B.2 Review-request cadence\n\n- **Eligibility:** request reviews ONLY from the client's actual customers, and only with the client's confirmed customer list. Never buy, scrape, or fabricate a contact list.\n- **Timing:** request within the client's service window (specify in the plan \u2014 e.g. 2 hours after a completed job). Maximum: one review request per customer per service event.\n- **Copy:** short, human, no pressure, no incentive offer. Template:\n  > `Thanks for choosing <Business> today. If you had a great experience, a Google review helps us a lot: <review link>. \u2014 <Business>`\n- **HARD COMPLIANCE (stop-and-report if violated):** NEVER offer incentives (discounts, freebies, entries) for reviews. NEVER gate \u2014 never selectively ask only happy customers, never suppress or filter negative feedback, never route unhappy customers away from the review platform. Every request goes to every served customer equally, or the cadence stops. See `vaults/rbm/legal/` for the standing review-gating rules.\n- **Opt-out:** every SMS request sequence honors STOP; every email includes unsubscribe. Record opt-outs.",
+  "est_tokens": 212
+ },
+ {
+  "id": "rbm-service-delivery-009",
+  "source": "rbm-service-delivery",
+  "heading": "B.3 Response-drafting procedure",
+  "heading_path": "rbm-service-delivery \u2014 manual.md > \u00a7B \u2014 Review Engine runbook > B.3 Response-drafting procedure",
+  "text": "### B.3 Response-drafting procedure\n\n1. **Detect:** daily check of the client's GBP (read-only) for new reviews. Log: reviewer, stars, date, text summary.\n2. **Classify:** POSITIVE (4\u20135\u2605), NEUTRAL (3\u2605), NEGATIVE (1\u20132\u2605), SPAM/FALSE (flag \u2014 do not respond publicly without Aaryn).\n3. **Draft:** write the response per the tone rubric (B.4). POSITIVE and NEUTRAL: draft and stage. NEGATIVE: draft and stage, flagged for Aaryn's review before posting \u2014 sensitive responses always get human review. SPAM/FALSE: flag to Aaryn; never engage publicly without his say-so.\n4. **Approval:** every response draft gets Aaryn's per-send approval before posting (client-facing text rule). NEGATIVE-review responses additionally require the client's sign-off \u2014 route via Aaryn.\n5. **Post + log:** on approval, post and record: response text, timestamp, reviewer. Target: [redacted \u2014 internal service targets].",
+  "est_tokens": 164
+ },
+ {
+  "id": "rbm-service-delivery-010",
+  "source": "rbm-service-delivery",
+  "heading": "B.4 Tone rubric (all client review responses)",
+  "heading_path": "rbm-service-delivery \u2014 manual.md > \u00a7B \u2014 Review Engine runbook > B.4 Tone rubric (all client review responses)",
+  "text": "### B.4 Tone rubric (all client review responses)\n\n- **Voice:** the client's business voice, not RBM's. Warm, specific, never templated-sounding \u2014 reference something real from the review (the service, the tech's name, the outcome).\n- **POSITIVE:** thank by name if given, name the service, invite them back. \u226460 words.\n- **NEUTRAL (3\u2605):** acknowledge what was okay and what wasn't, name one concrete improvement, invite direct contact. No defensiveness.\n- **NEGATIVE:** empathize first, never argue, never litigate facts publicly, name a concrete next step (owner's direct line / callback offer), take it offline. Staged for Aaryn's review ALWAYS; posted only with client sign-off via Aaryn.\n- **Never:** boilerplate (\"Thanks for your review!\"), ALL-CAPS, emoji spam, claims the business can't verify, disclosure of the reviewer's personal data beyond what they posted.",
+  "est_tokens": 168
+ },
+ {
+  "id": "rbm-service-delivery-011",
+  "source": "rbm-service-delivery",
+  "heading": "B.5 Velocity reporting (monthly)",
+  "heading_path": "rbm-service-delivery \u2014 manual.md > \u00a7B \u2014 Review Engine runbook > B.5 Velocity reporting (monthly)",
+  "text": "### B.5 Velocity reporting (monthly)\n\nMonthly report per client. Rating + count re-verified from GBP, never estimated.\n\n```\nREVIEW ENGINE \u2014 <client> \u2014 <month>\nBASELINE: <rating>\u2605 across <n> reviews (<date>)\nTHIS MONTH: <rating>\u2605 across <n> reviews\nVELOCITY: <+n> reviews this month (avg <x.x>/mo trailing 3)\nRESPONSES: <n> drafted / <n> posted \u2014 response time median <x>h\nNEGATIVE: <n> \u2014 status: <responded / pending client sign-off>\nCADENCE HEALTH: requests sent <n> / opt-outs <n> / delivery issues <one line>\nSTATUS: ON-TRACK | ATTENTION \u2014 <why, if attention>\n```",
+  "est_tokens": 113
+ },
+ {
+  "id": "rbm-service-delivery-012",
+  "source": "rbm-service-delivery",
+  "heading": "B.6 Sensitive-response human-review rule",
+  "heading_path": "rbm-service-delivery \u2014 manual.md > \u00a7B \u2014 Review Engine runbook > B.6 Sensitive-response human-review rule",
+  "text": "### B.6 Sensitive-response human-review rule\n\nAny review that involves: a safety incident, a legal threat, an accusation of fraud/dishonesty, a named employee being attacked, or anything that could require legal counsel \u2192 **stop, draft nothing publicly, report to Aaryn immediately.** The response is written by Aaryn (or the client) \u2014 this agent prepares a private situation summary only.\n\n---",
+  "est_tokens": 77
+ },
+ {
+  "id": "rbm-service-delivery-013",
+  "source": "rbm-service-delivery",
+  "heading": "\u00a7C \u2014 Monthly managed cadence (both products)",
+  "heading_path": "rbm-service-delivery \u2014 manual.md > \u00a7C \u2014 Monthly managed cadence (both products)",
+  "text": "## \u00a7C \u2014 Monthly managed cadence (both products)\n\nRun monthly per LIVE client. Output: the product's report block (A.6 weekly, B.5 monthly) staged for Aaryn, plus a one-line `learnings.md` entry. If nothing changed and no action is needed: `STATUS: ON-TRACK \u2014 no action` (report block still filed in state).\n\n1. **Pull the numbers.** Read-only: vendor logs (Missed-Call), GBP (Review Engine). Record counts + dates in the client state file.\n2. **Check the gates.** A2P campaign still APPROVED? Number still provisioned? Cadence still sending? Any delivery failures or opt-out spikes? A broken gate = ATTENTION with a remediation proposal.\n3. **Check compliance.** Missed-Call: texts-per-call rule held? Business-hours rule held? Review Engine: any incentive/gating drift in the month's sequences? Any drift = stop + report (compliance gates are hard stops).\n4. **Verify outcomes.** Missed-Call: confirm \"jobs booked\" count against the client's records (ask via Aaryn \u2014 never assume a reply = booking). Review Engine: velocity trend vs baseline.\n5. **Stage the report.** File in `state/<client-slug>/reports/<YYYY-MM>.md` (Missed-Call: weekly files `reports/<YYYY-Www>.md`; Review Engine: monthly).\n6. **Surface to Aaryn.** Through the normal review surface (morning brief / proposal packet) \u2014 never sent to the client directly. Client-facing communication always routes through Aaryn's per-send approval.",
+  "est_tokens": 259
+ },
+ {
+  "id": "chewybits-scriptwriter-000",
+  "source": "chewybits-scriptwriter",
+  "heading": "ChewyBits Scriptwriter \u2014 manual.md",
+  "heading_path": "ChewyBits Scriptwriter \u2014 manual.md",
+  "text": "# ChewyBits Scriptwriter \u2014 manual.md\n\nExecutable procedure. `prompt.md` is the contract; this file is the procedure. If they disagree, this file wins on procedure, `prompt.md` wins on boundaries.\n\n## Procedure\n\n### Step 1 \u2014 Read the contract\n\nRead `prompt.md`, this `manual.md`, and `knowledge.md`. Read `learnings.md` newest entries for anything the last run flagged. Timebox: 3 minutes.",
+  "est_tokens": 73
+ },
+ {
+  "id": "chewybits-scriptwriter-001",
+  "source": "chewybits-scriptwriter",
+  "heading": "Step 2 \u2014 Read the source packet",
+  "heading_path": "ChewyBits Scriptwriter \u2014 manual.md > Procedure > Step 2 \u2014 Read the source packet",
+  "text": "### Step 2 \u2014 Read the source packet\n\nRead the series-expert's source packet end to end: **material** (the angle + mechanic), **references** (traceable sources), **confidence tiers** per claim. Log mentally: which claims are FOUNDER/TEXT (scriptable as-is), which are WIKI/SECONDARY (scriptable with care), which are absent or thin (scriptable only as `[VERIFY]` or dropped). Never script from memory \u2014 the packet is the only source of truth.",
+  "est_tokens": 86
+ },
+ {
+  "id": "chewybits-scriptwriter-002",
+  "source": "chewybits-scriptwriter",
+  "heading": "Step 3 \u2014 Select the single mechanic/hook",
+  "heading_path": "ChewyBits Scriptwriter \u2014 manual.md > Procedure > Step 3 \u2014 Select the single mechanic/hook",
+  "text": "### Step 3 \u2014 Select the single mechanic/hook\n\nOne short = one mechanic, one hook. Pick from the packet's strongest FOUNDER/TEXT-grounded angle; LitRPG-first per the fandom ranking (LitRPG > fantasy > manga > anime-adaptation). If the packet offers several angles, pick the one with the strongest concrete nouns (these become the illustration candidates) and the clearest in-world stakes. Write the hook down before drafting.",
+  "est_tokens": 83
+ },
+ {
+  "id": "chewybits-scriptwriter-003",
+  "source": "chewybits-scriptwriter",
+  "heading": "Step 4 \u2014 Draft one pass in the template",
+  "heading_path": "ChewyBits Scriptwriter \u2014 manual.md > Procedure > Step 4 \u2014 Draft one pass in the template",
+  "text": "### Step 4 \u2014 Draft one pass in the template\n\nWrite the script in one pass using the skeleton in \u00a7\"Script template\". Total budget: **115\u2013130 words**, ~**0.472 s/word** (Vanessa pacing) \u2192 **54\u201362s**, target **~57.6s**. Beat 7 (endcard) is a branding lock \u2014 do not alter. Do not re-draft: trim or extend inside the same pass if word count drifts.",
+  "est_tokens": 77
+ },
+ {
+  "id": "chewybits-scriptwriter-004",
+  "source": "chewybits-scriptwriter",
+  "heading": "Step 5 \u2014 Grounding pass",
+  "heading_path": "ChewyBits Scriptwriter \u2014 manual.md > Procedure > Step 5 \u2014 Grounding pass",
+  "text": "### Step 5 \u2014 Grounding pass\n\nWalk every factual claim against the packet. Tag each beat's claim with its confidence tier + source reference in the `_Grounded in:_` line. Any claim with no packet source: either cut it or mark the beat `[VERIFY]` and carry the flag into the handoff report. Tonal texture (\"cut out of the monsters\") needs no tag; factual assertions do.",
+  "est_tokens": 83
+ },
+ {
+  "id": "chewybits-scriptwriter-005",
+  "source": "chewybits-scriptwriter",
+  "heading": "Step 6 \u2014 Voice pass",
+  "heading_path": "ChewyBits Scriptwriter \u2014 manual.md > Procedure > Step 6 \u2014 Voice pass",
+  "text": "### Step 6 \u2014 Voice pass\n\nRead the draft aloud (mentally). It must sound like the series, not a video essay about the series: in-world expert/character POV, series-native vocabulary, no meta math-speak. Banned patterns: \"overpowered mechanic,\" \"stat screen,\" \"hypothesis,\" \"designed to be solved,\" \"theory-crafts like it's a second job.\" Repair any hit in the same pass.",
+  "est_tokens": 73
+ },
+ {
+  "id": "chewybits-scriptwriter-006",
+  "source": "chewybits-scriptwriter",
+  "heading": "Step 7 \u2014 On-screen text cues + illustration picks",
+  "heading_path": "ChewyBits Scriptwriter \u2014 manual.md > Procedure > Step 7 \u2014 On-screen text cues + illustration picks",
+  "text": "### Step 7 \u2014 On-screen text cues + illustration picks\n\nFor each beat: one on-screen text cue (headline \u2264 6 words, kicker \u2264 4 words \u2014 legible burned captions depend on short text). Select **2\u20133 illustration candidates** at script time: the beats with the strongest concrete nouns. Pick the **cover** from the strongest illustration candidate (the feed thumbnail). Note each pick in the build note with the visual intent and a caption-safe direction (\"darker, emptier lower third\").",
+  "est_tokens": 100
+ },
+ {
+  "id": "chewybits-scriptwriter-007",
+  "source": "chewybits-scriptwriter",
+  "heading": "Step 8 \u2014 Write the caption file",
+  "heading_path": "ChewyBits Scriptwriter \u2014 manual.md > Procedure > Step 8 \u2014 Write the caption file",
+  "text": "### Step 8 \u2014 Write the caption file\n\nWrite all four variants per \u00a7\"Platform caption format spec\". Captions tease the mechanic, never reproduce prose/panels, and never promise what the video doesn't deliver. Spoiler level labeled in the file header (light\u2013moderate default: Book-1 scope unless the packet says otherwise).",
+  "est_tokens": 62
+ },
+ {
+  "id": "chewybits-scriptwriter-008",
+  "source": "chewybits-scriptwriter",
+  "heading": "Step 9 \u2014 Save to deliverables",
+  "heading_path": "ChewyBits Scriptwriter \u2014 manual.md > Procedure > Step 9 \u2014 Save to deliverables",
+  "text": "### Step 9 \u2014 Save to deliverables\n\nDeliverables directory: `~/your_files/chewybits-docket-kit/deliverables/`. Naming convention:\n- Script: `short-NN-<topic-slug>-script.md` (NN is the per-series sequence, zero-padded; e.g. `short-02-confluence-part2-script.md`). Interim drafts: append `-v2-DRAFT` etc.\n- Captions: `short-NN-<topic-slug>-captions.md`\n- Build note: `short-NN-<topic-slug>-build-note.md` (hook line, beat count, illustration picks + prompts direction, timing math, watch-outs)\n\n### Step 10 \u2014 Build-note handoff\n\nWrite the build note (see skeleton below), then issue the handoff report per the `prompt.md` output contract. State explicitly that the script is awaiting Aaryn's text review and is **not** publish-approved.\n\n### Step 11 \u2014 Log the learning\n\nAppend one line to `learnings.md` per the header's format.\n\n---",
+  "est_tokens": 131
+ },
+ {
+  "id": "chewybits-scriptwriter-009",
+  "source": "chewybits-scriptwriter",
+  "heading": "Script template (verbatim skeleton)",
+  "heading_path": "ChewyBits Scriptwriter \u2014 manual.md > Script template (verbatim skeleton)",
+  "text": "## Script template (verbatim skeleton)\n\n```markdown\n# Short #NN \u2014 Script (<Topic>)\n**Status:** DRAFT FOR FOUNDER REVIEW \u2014 no audio generated, no video built.\n**Source packet:** <packet id / series-expert source>\n**Series:** <series title> | **Lane:** LitRPG|fantasy|manga|anime\n**Direction:** documentary from inside the world \u2014 <3-word tonal signature of this series>.\n**Grounding rule:** every factual claim traces to the source packet. Uncertain = [VERIFY] \u2014 never invented.\n\n---\n\n### Beat 1 \u2014 HOOK (0.0\u2013~6s, 10\u201316 words)\n\n> <VO line \u2014 the entire hook claim lands inside the first 2 seconds. No preamble.>\n\n_Grounded in:_ <packet ref + tier>\n_On-screen:_ headline **<\u22646 words>** / kicker **<\u22644 words>**\n\n### Beat 2 \u2014 SETUP (~6\u201312s, 12\u201318 words)\n\n> <VO line \u2014 the mechanic's core rule, in series-native vocabulary.>\n\n_Grounded in:_ <packet ref + tier>\n_On-screen:_ headline **...** / kicker **...**\n\n### Beat 3 \u2014 THE TWIST (~12\u201321s, 15\u201320 words)\n\n> <VO line \u2014 the hidden catch, the asymmetry, the thing the community under-discusses.>\n\n_Grounded in:_ <packet ref + tier>\n_On-screen:_ headline **...** / kicker **...**\n\n### Beat 4 \u2014 THE STAKES (~21\u201332s, 20\u201326 words)\n\n> <VO line \u2014 what the mechanic costs: irreversibility, body-horror-adjacent stakes, sacrifice.>\n\n_Grounded in:_ <packet ref + tier>\n_On-screen:_ headline **...** / kicker **...**\n\n### Beat 5 \u2014 THE CHARACTER ANCHOR (~32\u201347s, 28\u201334 words)\n\n> <VO line \u2014 the named character who embodies the mechanic; specific, founder-verified where possible.>\n\n_Grounded in:_ <packet ref + tier>\n_On-screen:_ headline **...** / kicker **...**\n\n### Beat 6 \u2014 THE REFRAMING QUESTION (~47\u201354s, 12\u201316 words)\n\n> <VO line \u2014 contrast with generic genre fare, ending on a transformation question.>\n\n_Grounded in:_ <packet ref + tier>\n_On-screen:_ headline **...** / kicker **...**",
+  "est_tokens": 360
+ },
+ {
+  "id": "chewybits-scriptwriter-010",
+  "source": "chewybits-scriptwriter",
+  "heading": "Beat 7 \u2014 ENDCARD (~54\u201357.6s, 7 words \u2014 BRANDING LOCK, do not alter)",
+  "heading_path": "ChewyBits Scriptwriter \u2014 manual.md > Script template (verbatim skeleton) > Beat 7 \u2014 ENDCARD (~54\u201357.6s, 7 words \u2014 BRANDING LOCK, do not alter)",
+  "text": "### Beat 7 \u2014 ENDCARD (~54\u201357.6s, 7 words \u2014 BRANDING LOCK, do not alter)\n\n> That's Systems Check. New deep dive every Friday.\n\n_Visual:_ PIL endcard \u2014 unchanged.\n```\n\nWord total check: 115\u2013130. Timing check: total words \u00d7 0.472 \u2248 54\u201362s.\n\n---",
+  "est_tokens": 55
+ },
+ {
+  "id": "chewybits-scriptwriter-011",
+  "source": "chewybits-scriptwriter",
+  "heading": "Hook rules (first 2 seconds)",
+  "heading_path": "ChewyBits Scriptwriter \u2014 manual.md > Hook rules (first 2 seconds)",
+  "text": "## Hook rules (first 2 seconds)\n\n1. The hook is one claim, spoken and readable, inside the first 2 seconds \u2014 no \"hey guys,\" no setup preamble, no brand intro.\n2. The hook states the world's rule as fact, from inside the world (\"In this world, power isn't earned. It's harvested\") \u2014 never about the rule (\"Here's the most overpowered mechanic in progression fantasy\").\n3. The hook's noun must be visualizable \u2014 it sets the cover art (strongest concrete noun wins).\n4. The hook never spoils beyond the labeled spoiler level; Book-1 mechanics are fair game unless the packet says otherwise.\n5. Test: read it aloud cold. If it sounds like a video essay, rewrite it until it sounds like someone who lives there.\n\n---",
+  "est_tokens": 162
+ },
+ {
+  "id": "chewybits-scriptwriter-012",
+  "source": "chewybits-scriptwriter",
+  "heading": "Platform caption format spec",
+  "heading_path": "ChewyBits Scriptwriter \u2014 manual.md > Platform caption format spec",
+  "text": "## Platform caption format spec\n\nCaption file: `short-NN-<topic-slug>-captions.md`. Four sections, exact headers. Base long caption shared across IG/TikTok/YouTube; hashtags differ by platform.\n\n```markdown\n# Captions \u2014 Short #NN (<Topic>)\n**Spoiler level:** light\u2013moderate (Book 1 mechanics only)\n**Video delivers:** <one line \u2014 what the short actually shows. Captions must not promise more.>",
+  "est_tokens": 66
+ },
+ {
+  "id": "chewybits-scriptwriter-013",
+  "source": "chewybits-scriptwriter",
+  "heading": "Instagram",
+  "heading_path": "ChewyBits Scriptwriter \u2014 manual.md > Instagram",
+  "text": "## Instagram\n\n<Paragraph 1: one-line thesis, tease form \u2014 no prose/panels reproduced.>\n<Paragraph 2: 2\u20133 sentences expanding the mechanic in series-native voice.>\n<CTA line: \"This week's Systems Check tears it down properly \u2014 link in bio. What series should we check next? \ud83d\udc47\">\n\n#LitRPG #<SeriesHashtag> #<GenreHashtag> #SystemsCheck\n\n## TikTok\n\n<Same long caption as Instagram, or tightened variant. 3\u20135 hashtags max.>\n<CTA: \"Full breakdown in this week's Systems Check, link in bio.\">\n\n## YouTube\n\n<Same long caption as Instagram.>\n<CTA line: \"Full breakdown in this week's Systems Check \u2014 link in bio / subscribe for the Friday deep dive.\">",
+  "est_tokens": 127
+ },
+ {
+  "id": "chewybits-scriptwriter-014",
+  "source": "chewybits-scriptwriter",
+  "heading": "X",
+  "heading_path": "ChewyBits Scriptwriter \u2014 manual.md > X",
+  "text": "## X\n\n<One short post, \u2264280 characters, no hashtags. One real claim + the tension, in brand voice. Optional emoji (\ud83e\uddf5).>\n<Optional follow-up thread post if the mechanic supports it \u2014 same length cap.>\n```\n\nCaption rules:\n- Long caption = IG/TikTok/YouTube share the base; only hashtags and CTA line vary.\n- X = short, punchy, no hashtags, \u2264280 chars per post. A follow-up thread post is allowed when the mechanic supports a second beat.\n- Every caption names the series and the mechanic; none reproduces copyrighted prose, panels, or extended quotes.\n- No caption implies Aaryn appeared on camera or narrated. No caption promises content the video doesn't deliver.\n```\n\n---\n\n## Build-note skeleton\n\n```markdown\n# Build note \u2014 Short #NN (<Topic>)\n**Script:** short-NN-<topic-slug>-script.md | **Words:** <N> | **Est. duration:** <N>s (words \u00d7 0.472)\n**Hook line:** \"<first 2 seconds>\"\n\n## Beat timing\n\n| Beat | Est. time | Words | On-screen headline | Kicker |\n|------|-----------|-------|--------------------|--------|\n| 1 | 0.0\u2013~6s | <n> | ... | ... |\n...beats 2\u20137...\n\n## Illustration candidates (2\u20133, decided at script time)\n\n- Beat <n>: <visual intent> \u2014 <why this concrete noun earns art>\n- Beat <n>: <visual intent> \u2014 ...\n**Cover pick:** beat <n> \u2014 <why it's the feed thumbnail>",
+  "est_tokens": 269
+ },
+ {
+  "id": "chewybits-scriptwriter-015",
+  "source": "chewybits-scriptwriter",
+  "heading": "Art direction",
+  "heading_path": "ChewyBits Scriptwriter \u2014 manual.md > Art direction",
+  "text": "## Art direction\n\n- Original AI-generated imagery in the tonal vibe of <series>; NEVER fan art / series art / screenshots.\n- Darker, emptier lower thirds for caption-safe zones.\n- Brand overlays: \"SYSTEMS CHECK\" whisper + gold tracked kicker + serif headline; dark gradients top/bottom for legibility.",
+  "est_tokens": 61
+ },
+ {
+  "id": "chewybits-scriptwriter-016",
+  "source": "chewybits-scriptwriter",
+  "heading": "Voice / build chain",
+  "heading_path": "ChewyBits Scriptwriter \u2014 manual.md > Voice / build chain",
+  "text": "## Voice / build chain\n\n- TTS: single pass, Vanessa (\"Cheerful Sunflower\") \u2014 the main ChewyBits voice.\n- Slides: PIL text cards (zero tokens). Assembly: ffmpeg (zero tokens). Agentic AI video generation: NOT for this piece (reserved for special pieces).\n- SRT: phrase-level cues from beat timing, 2 cues/beat split at word midpoint; burned via libass.\n\n## Watch-outs\n\n- <legibility / timing / art risks, or \"none\">\n- **Status:** awaiting Aaryn's text review \u2014 NOT publish-approved.\n```\n\n---",
+  "est_tokens": 101
+ },
+ {
+  "id": "chewybits-scriptwriter-017",
+  "source": "chewybits-scriptwriter",
+  "heading": "HARD RULES (repeat: also in prompt.md \u00a74)",
+  "heading_path": "ChewyBits Scriptwriter \u2014 manual.md > HARD RULES (repeat: also in prompt.md \u00a74)",
+  "text": "## HARD RULES (repeat: also in prompt.md \u00a74)\n\n- Never scrape fan art, series art, screenshots, or panels \u2014 original AI-generated imagery in the series' tonal vibe only.\n- Never imply Aaryn appeared on camera, was filmed, or personally narrated. \"Personalized video walkthrough\" appears only in marketing copy.\n- Brand separation: ChewyBits accounts and `contact@chewybits.com` only; never RBM / ChewyBlocks / Centuries in Ink senders, tools, or accounts.\n- No outreach email or DM without Aaryn's explicit per-send approval for that exact send. Approving a script is never send approval.\n- Routine pieces use the templated one-pass pipeline only. Agentic AI video generation is reserved for special pieces.\n- Thin material \u2192 `[VERIFY]` + flagged in the handoff. Never fabricate.\n\n---",
+  "est_tokens": 157
+ },
+ {
+  "id": "chewybits-scriptwriter-018",
+  "source": "chewybits-scriptwriter",
+  "heading": "Shorts Foundry client-intake variant (approved 2026-10-02 \u2014 staging only)",
+  "heading_path": "ChewyBits Scriptwriter \u2014 manual.md > Shorts Foundry client-intake variant (approved 2026-10-02 \u2014 staging only)",
+  "text": "## Shorts Foundry client-intake variant (approved 2026-10-02 \u2014 staging only)\n\n**What it is.** Shorts Foundry is the ChewyBits client product: 55\u201365s illustrated shorts built from a client brief. Pricing: [redacted \u2014 unreleased offer pricing]. SLA: [redacted \u2014 unreleased offer terms]. Same templated one-pass pipeline \u2014 the ONLY change is where the brief comes from.\n\n**Client brief \u2192 one-pass script procedure:**\n1. **Intake.** Record the brief verbatim: the client's topic/claim, target audience, the one takeaway the viewer should leave with, and any facts the client asserts (these ship to research, not straight to script).\n2. **Research gate.** Same thin-material rule as always: client-asserted facts go through `chewybits-series-expert` (or the series bible, if one exists) before they touch the script. Unverifiable client claims \u2192 `[VERIFY]` + flagged back to the client, never smoothed into the script.\n3. **One-pass script.** Apply the identical 7-beat discipline as Short #1 \u2014 same beat map, same timing math (55\u201365s total), same SRT phrase-level cues, same illustrated-variant option. The pipeline doesn't change; the source of the brief does.\n4. **Rights gate.** The client does not override the HARD RULES: no scraped art (original AI-generated imagery in the series' tonal vibe only), no client-supplied copyrighted panels without a license, no implying Aaryn appeared on camera.\n5. **Handoff.** Script + build note staged per the existing contract; video-builder picks up with its client QA checklist. The FIRST short per client stops after TTS + slide render (before final assembly) for Aaryn's text/audio review \u2014 his approval unlocks the standard pipeline for that client's subsequent shorts; any client-requested direction change re-arms the review gate.",
+  "est_tokens": 343
+ },
+ {
+  "id": "prospect-researcher-000",
+  "source": "prospect-researcher",
+  "heading": "Prospect Researcher \u2014 manual.md",
+  "heading_path": "Prospect Researcher \u2014 manual.md",
+  "text": "# Prospect Researcher \u2014 manual.md\n\nExecutable top-to-bottom: discover \u2192 score \u2192 write rows \u2192 hand off. Exact paths, exact formats, no improvisation. If `prompt.md` and this file disagree, this file wins on procedure; `prompt.md` wins on boundaries.\n\n---",
+  "est_tokens": 49
+ },
+ {
+  "id": "prospect-researcher-001",
+  "source": "prospect-researcher",
+  "heading": "\u00a70. Pre-run reads (do this first, every run)",
+  "heading_path": "Prospect Researcher \u2014 manual.md > \u00a70. Pre-run reads (do this first, every run)",
+  "text": "## \u00a70. Pre-run reads (do this first, every run)\n\n1. `~/agents/prospect-researcher/knowledge.md`\n2. `~/agents/prospect-researcher/learnings.md`\n3. `~/your_files/chewybits-docket-kit/qualification-scorecard.md`\n4. `~/your_files/chewybits-docket-kit/prospect-tracker.csv` \u2014 read the whole file.\n\nThen compute: for each lane, `quota \u2212 existing rows` (quotas: [redacted \u2014 internal prospecting quotas]; count rows by `lane` column, including EXAMPLE rows in the math only if you are replacing them \u2014 do not count EXAMPLE rows as filled quota). The run's target = the lane with the largest remaining quota unless the run brief names a lane. Default batch: the weekly lane split ([redacted \u2014 internal prospecting quotas]) scaled to the run brief.",
+  "est_tokens": 126
+ },
+ {
+  "id": "prospect-researcher-002",
+  "source": "prospect-researcher",
+  "heading": "\u00a71. Prospect discovery (lane order follows the fandom ranking)",
+  "heading_path": "Prospect Researcher \u2014 manual.md > \u00a71. Prospect discovery (lane order follows the fandom ranking)",
+  "text": "## \u00a71. Prospect discovery (lane order follows the fandom ranking)\n\nWork LitRPG first, then fantasy, then manga, then anime/adaptation. Within a lane, prioritize creators whose format has a visible \"depth gap\" the docket machine fills \u2014 long-form essayists, listicle channels that can't go deep, podcasts with loose structure, newsletters with thin verification.\n\n**Free, public sourcing surfaces (never buy data without Aaryn):**\n- YouTube: genre channels in the 10k\u2013500k subscriber range; check channel About pages for business-contact routes.\n- Podcasts: episode descriptions + show notes (caveats like \"didn't have time to verify\" live here); Apple Podcasts / Spotify listings for contact links.\n- Newsletters: archive pages for publishing cadence; reply-to headers and contact pages for routes.\n- TikTok: creator bios for business-email links.\n- Fandom-adjacent discovery: collab mentions, \"channels I watch\" lists, commenter recommendations, adaptation-news roundups.\n\n**What counts as a candidate before scoring:**\n- Name/channel identified, platform known, lane assigned, at least one source link.\n- NOT yet ruled out by an obvious disqualifier (dormant 60+ days, copied-summary content, piracy/deceptive content).\n\n**Romcom:** only where a romance-led fantasy property has a real adaptation or worldbuilding question; never force the lane (per genre-angle-templates.md, Template B romcom note).",
+  "est_tokens": 252
+ },
+ {
+  "id": "prospect-researcher-003",
+  "source": "prospect-researcher",
+  "heading": "\u00a72. Qualification scorecard procedure",
+  "heading_path": "Prospect Researcher \u2014 manual.md > \u00a72. Qualification scorecard procedure",
+  "text": "## \u00a72. Qualification scorecard procedure\n\nScore each dimension independently from verifiable evidence; write down the evidence, then the number.\n\n1. **Audience (0\u20132):** 2 = 10k\u2013500k followers/subscribers in range (cite the number and where you saw it). 1 = near range with strong engagement (high comments-to-views, active community). 0 = far out of range or weak fit. Do not guess subscriber counts \u2014 if unverified, say so and score conservatively (max 1).\n2. **Publishing cadence (0\u20132):** 2 = consistent, 2+ posts/episodes monthly for the last 3 months. 1 = inconsistent but active. 0 = dormant. Automatic disqualifier: no publishing in the last 60 days \u2192 score 0 here and stop (NO-FIT regardless of total).\n3. **Visible monetization (0\u20132):** 2 = multiple signals (sponsors, Patreon, merch, paid memberships, affiliate links). 1 = one signal. 0 = none visible. Disqualifier: no visible path to monetization and no evidence of budget \u2192 NO-FIT regardless of score.\n4. **Research debt (0\u20133):** 3 = explicit quote (\"I've been meaning to cover X\"). 2 = repeated inferred gap (two+ instances). 1 = mild/single instance. 0 = none \u2014 a prospect with 0 debt does not qualify even if the total would clear 5, because there is no docket to sell. Capture the quote or paraphrase with its source.\n5. **Access (0\u20131):** 1 = clear public business-contact route verified present (business email in About, contact form, press page). 0 = no appropriate route \u2192 NO-CONTACT, do not qualify.",
+  "est_tokens": 312
+ },
+ {
+  "id": "prospect-researcher-004",
+  "source": "prospect-researcher",
+  "heading": "\u00a72. Qualification scorecard procedure",
+  "heading_path": "Prospect Researcher \u2014 manual.md > \u00a72. Qualification scorecard procedure",
+  "text": "## \u00a72. Qualification scorecard procedure\n\n**Then apply the disqualifiers** (any one = NO-FIT, score irrelevant):\n- No publishing in the last 60 days.\n- No visible path to monetization and no evidence of budget.\n- Content built mainly on copied summaries or uncredited clips.\n- Requests for piracy, leaked material, impersonation, or deceptive attribution.\n- Demand for unlimited revisions or speculative work beyond the mini-sample.\n\n**Decision thresholds (from the scorecard):** 8\u201310 priority outreach (full mini-sample, docket first) \u00b7 7 normal queue (full mini-sample, docket first) \u00b7 5\u20136 test selectively (short sample, single or docket) \u00b7 0\u20134 do not pursue.\n\n**Four-line research note (required per qualified prospect, no more than four lines):**\n1. Why this creator fits.\n2. The specific debt signal (quote or paraphrase the evidence).\n3. The proposed sample topic.\n4. The public business-contact route.\nIf the reason can't fit in four lines, the prospect isn't ready \u2014 skip.",
+  "est_tokens": 195
+ },
+ {
+  "id": "prospect-researcher-005",
+  "source": "prospect-researcher",
+  "heading": "\u00a73. Prospect-tracker row format (match the schema exactly)",
+  "heading_path": "Prospect Researcher \u2014 manual.md > \u00a73. Prospect-tracker row format (match the schema exactly)",
+  "text": "## \u00a73. Prospect-tracker row format (match the schema exactly)\n\nColumns, in order (see `~/your_files/chewybits-docket-kit/prospect-tracker-schema.md`):\n\n`prospect,platform,lane,audience_size,score,debt_signal,sample_angle,contact_route,sample_sent_date,followup_1,followup_2,outcome,revenue,notes`\n\n**Write rules:**\n- One row per prospect. Append new rows at the end of `~/your_files/chewybits-docket-kit/prospect-tracker.csv`.\n- `platform`: youtube / podcast / newsletter / tiktok / other. `lane`: litrpg / fantasy / manga / anime.\n- `audience_size`: integer, approx; leave empty if unverified (never fabricate).\n- `score`: integer 0\u201310, always filled \u2014 **no score, no row**.\n- `sample_sent_date`, `followup_1`, `followup_2`: leave empty at research time \u2014 these are set at send time by the outreach flow, and every sent sample gets both follow-up dates at send time (that's the schema rule; this agent never sets them).\n- `outcome`: leave empty until an outcome exists (schema outcomes: no_reply / replied / call / docket_single / docket_bundle / retainer / dead).\n- `revenue`: 0.\n- `notes`: evidence summary \u2014 sources, engagement notes, anything reusable; quote short text with commas inside double quotes (CSV-escape any internal quotes).\n- CSV hygiene: comma-separate, quote fields containing commas, never leave trailing commas unbalanced.\n\n**EXAMPLE rows** in the CSV (header values starting `EXAMPLE \u2014`) are templates, not real prospects \u2014 never edit them into fake data; replace one with a real prospect only when the lane and platform match and the row otherwise fits.",
+  "est_tokens": 274
+ },
+ {
+  "id": "prospect-researcher-006",
+  "source": "prospect-researcher",
+  "heading": "\u00a74. Dedup against existing tracker rows",
+  "heading_path": "Prospect Researcher \u2014 manual.md > \u00a74. Dedup against existing tracker rows",
+  "text": "## \u00a74. Dedup against existing tracker rows\n\nBefore scoring any candidate, compare against every row in the tracker CSV:\n- Match on `prospect` name/channel, fuzzy on minor variants (\"BellTube\" vs \"Brian Bell / BellTube\" = same prospect \u2014 this was the actual merge that already happened).\n- Also match on channel URL if the candidate came from one: the same channel under a rebranded name is a duplicate.\n- A duplicate is dropped from the qualified set; note it in the run's learnings line if a lane's pool is showing saturation (third duplicate in a lane = signal to widen sourcing, not to squeeze).\n- Cross-check `~/memory/people/` index if the candidate might already be a known person \u2014 do not create a second record of the same person.",
+  "est_tokens": 166
+ },
+ {
+  "id": "prospect-researcher-007",
+  "source": "prospect-researcher",
+  "heading": "\u00a75. Handoff to outreach (qualified-only batch)",
+  "heading_path": "Prospect Researcher \u2014 manual.md > \u00a75. Handoff to outreach (qualified-only batch)",
+  "text": "## \u00a75. Handoff to outreach (qualified-only batch)\n\nThe handoff is the output contract block from prompt.md \u00a76 \u2014 one block per qualified prospect, each carrying:\n- Score with dimension breakdown, debt signal, sample angle.\n- **ANGLE HINT:** which genre-angle-template (A/B/C/D from `~/your_files/chewybits-docket-kit/genre-angle-templates.md`) and which hook angle, with one line on why it fits *this prospect's actual work*. This is a hint, not a draft \u2014 outreach owns angle selection.\n- The verified public business-contact route (this is the route outreach will use; no other route).\n- Source links for every fact the outreach agent will need for personalization proof.\n\n**The handoff contains qualified prospects ONLY.** NO-FIT and NO-CONTACT candidates appear only in the DISCARDED lines, never in handoff blocks. If outreach asked for N and you qualified M < N, hand off M and say so \u2014 never pad with below-bar prospects.",
+  "est_tokens": 185
+ },
+ {
+  "id": "prospect-researcher-008",
+  "source": "prospect-researcher",
+  "heading": "\u00a76. Failure classes",
+  "heading_path": "Prospect Researcher \u2014 manual.md > \u00a76. Failure classes",
+  "text": "## \u00a76. Failure classes\n\n| Class | Trigger | Action |\n|---|---|---|\n| `NO-CONTACT` | No public business-contact route found after checking About/description/contact page | Log discard with what was checked; never guess or invent an address |\n| `NO-FIT` | Wrong genre, any disqualifier, score < 5, zero debt signal | Log discard with one-line reason; do not pass on |\n| `DUPLICATE` | Matches an existing tracker row | Drop silently; flag lane saturation in learnings if recurring |\n| `UNVERIFIABLE` | Key claim (audience, cadence) has no checkable source | Do not score on it; second source or discard as NO-FIT |\n| `LANE-FULL` | Lane quota reached ([redacted \u2014 internal prospecting quotas]) | Halt that lane; report and move to next lane by quota |\n| `SOURCE-DEAD` | Link 404s / content removed | Treat as unverifiable; find alternate source or discard |",
+  "est_tokens": 191
+ },
+ {
+  "id": "prospect-researcher-009",
+  "source": "prospect-researcher",
+  "heading": "\u00a77. Run closeout",
+  "heading_path": "Prospect Researcher \u2014 manual.md > \u00a77. Run closeout",
+  "text": "## \u00a77. Run closeout\n\n1. Verify every qualified prospect has a tracker row with a score.\n2. Verify every discard has a one-line DISCARDED entry.\n3. Append exactly one line to `learnings.md` per its header format.\n4. Final line of output: `HANDOFF COMPLETE \u2014 qualified rows only; nothing has been contacted, nothing approved to contact.`\n\n---",
+  "est_tokens": 73
+ },
+ {
+  "id": "prospect-researcher-010",
+  "source": "prospect-researcher",
+  "heading": "\u00a78. Launching-author sourcing \u2014 Launch Intel pipeline (approved 2026-10-02 \u2014 staging only)",
+  "heading_path": "Prospect Researcher \u2014 manual.md > \u00a78. Launching-author sourcing \u2014 Launch Intel pipeline (approved 2026-10-02 \u2014 staging only)",
+  "text": "## \u00a78. Launching-author sourcing \u2014 Launch Intel pipeline (approved 2026-10-02 \u2014 staging only)\n\n**Target.** Authors launching (or about to launch) LitRPG/progression titles \u2014 buyers of the Launch Intel product ([redacted \u2014 unreleased offer pricing]). These are SELL-TO prospects, not docket prospects; the handoff feeds the docket-builder's Launch Intel procedure (\u00a77).\n\n**Sources (in order):**\n1. **Royal Road rising.** Rising Stars / trending lists in LitRPG-relevant genres; authors with serials approaching a KU launch (announcement posts, \"going stub\" notices).\n2. **KU new releases.** New-release and new-author movement in LitRPG / GameLit / progression fantasy categories; debut authors with launch-week momentum.\n3. **Adjacent signals.** Author Discords / subreddits announcing launch dates; cover-reveal posts with pre-order links.\n\n**Qualification scorecard (adapted from the docket scorecard).** Score 0\u201310:\n- Launch window \u2264 90 days: +3 \u00b7 90\u2013180 days: +1 \u00b7 none visible: 0\n- Public contact route (website form, newsletter reply-to, open social DMs): +2 (no route = NO-CONTACT, same as \u00a76)\n- Series intent (\u22652 books planned) or clear standalone positioning: +2\n- Audience signal (Royal Road followers, newsletter, social following): +2\n- Genre fit (LitRPG/progression core, not adjacent): +1\n\nDisqualifiers: trad-pub-only authors with no indie path; authors who've publicly declined marketing services; score < 5. Same failure classes as \u00a76 (NO-CONTACT, NO-FIT, DUPLICATE, UNVERIFIABLE, LANE-FULL, SOURCE-DEAD); closeout per \u00a77 with the handoff line: `HANDOFF COMPLETE \u2014 Launch Intel prospects only; nothing has been contacted, nothing approved to contact.`",
+  "est_tokens": 304
+ },
+ {
+  "id": "prospect-researcher-011",
+  "source": "prospect-researcher",
+  "heading": "\u00a79. Local-biz prospecting \u2014 RBM (missed-call / review pain signals) (approved 2026-10-02 \u2014 staging only)",
+  "heading_path": "Prospect Researcher \u2014 manual.md > \u00a79. Local-biz prospecting \u2014 RBM (missed-call / review pain signals) (approved 2026-10-02 \u2014 staging only)",
+  "text": "## \u00a79. Local-biz prospecting \u2014 RBM (missed-call / review pain signals) (approved 2026-10-02 \u2014 staging only)\n\n**Target.** Local service businesses showing missed-call or review pain \u2014 buyers of Missed-Call Rescue ([redacted \u2014 unreleased offer pricing]) and Review Engine ([redacted \u2014 unreleased offer pricing]).\n\n**Pain signals to log per prospect:**\n- **Missed-call:** after-hours \"call us\" CTAs with no booking alternative; Google reviews mentioning \"never called back\" / \"couldn't reach them\"; single-line-phone businesses in high-call-volume trades (HVAC, plumbing, dental, legal intake).\n- **Review:** < 4.2 stars with recent negative reviews unanswered; review velocity stalled > 90 days; owner responses defensive or absent.\n\n**Qualification.** Score 0\u201310: pain-signal strength +3 \u00b7 public contact route +2 \u00b7 10+ employees or multi-location +2 \u00b7 review count > 50 (rescue) or < 50 with growth intent (engine) +2 \u00b7 service-area business +1. Disqualifiers: score < 5; businesses already running incentivized or review-gated schemes (compliance \u2014 never touch); franchise-locked marketing.\n\nHARD RULE: prospecting never fabricates a pain signal \u2014 every signal logged with its source URL. The Review Engine compliance rules in `~/vaults/rbm/legal/` are hard fails, not guidelines.",
+  "est_tokens": 234
+ },
+ {
+  "id": "vault-keeper-000",
+  "source": "vault-keeper",
+  "heading": "Vault Keeper \u2014 manual.md",
+  "heading_path": "Vault Keeper \u2014 manual.md",
+  "text": "# Vault Keeper \u2014 manual.md\n\nThe sweep procedure. Executable top-to-bottom. If this file and `prompt.md` disagree, this file wins on procedure; `prompt.md` wins on boundaries.\n\n## \u00a70. Setup\n\n```bash\nDATE=$(date +%F)\nAGENTS=~/agents\nVAULTS=~/vaults\n```\n\nRead in order before acting: `~/vaults/GRAPH.md`, `~/agents/README.md`, `~/agents/vault-keeper/knowledge.md`, `~/agents/vault-keeper/learnings.md`, `state/last-sweep.txt`. Resume any open items from the last sweep \u2014 do not restart them as new findings.",
+  "est_tokens": 78
+ },
+ {
+  "id": "vault-keeper-001",
+  "source": "vault-keeper",
+  "heading": "\u00a71. Inventory",
+  "heading_path": "Vault Keeper \u2014 manual.md > \u00a71. Inventory",
+  "text": "## \u00a71. Inventory\n\nList every agent vault and every business aspect-vault on disk, then compare against the two indexes.\n\n```bash\n# Agent vaults on disk (exclude the template itself and non-vault dirs if any)\nls -d $AGENTS/*/ | sed \"s|$AGENTS/||; s|/$||\"\n# Business aspect-vaults on disk: exactly <business>/<aspect>, 7 aspects x 4 businesses expected\nfind $VAULTS -mindepth 2 -maxdepth 2 -type d | sort\n```\n\nRecord counts: `A_DISK` (agent dirs), `B_DISK` (aspect dirs). Then:\n\n1. Cross-check agent dirs against the vault index table in `README.md` \u2014 flag any dir on disk missing from the table, and any table entry with no dir on disk.\n2. Cross-check against GRAPH.md's stated node counts (\"13 agent vaults (5 baselines + 8 specialized)\", \"28 business aspect-vaults\") \u2014 flag any arithmetic mismatch.\n3. For each agent dir, verify the canonical five: `prompt.md`, `manual.md`, `knowledge.md`, `learnings.md`, `state/`. Flag missing members. (Business aspect-vaults carry `index.md` instead of `prompt.md`/`state/` per knowledge.md \u2014 see \u00a70 setup; flag deviations from *that* layout, not the agent layout.)\n4. Flag any directory under `$AGENTS` or two levels under `$VAULTS` that is neither an indexed vault nor documented in README.md/GRAPH.md.\n\nOutput of this step: an inventory table with columns `path | on-disk | in README | in GRAPH | layout-ok | notes`.",
+  "est_tokens": 272
+ },
+ {
+  "id": "vault-keeper-002",
+  "source": "vault-keeper",
+  "heading": "\u00a72. Link hygiene",
+  "heading_path": "Vault Keeper \u2014 manual.md > \u00a72. Link hygiene",
+  "text": "## \u00a72. Link hygiene\n\nVerify every markdown link and `~/...` path reference resolves to a real file.\n\n```bash\n# All markdown link targets and bare workspace paths referenced across vault markdown:\ngrep -rhoE '\\]\\(~/[^)]+\\)|\\(sandbox://workspace/[^)]+\\)|~/[A-Za-z0-9_./-]+\\.(md|json|csv|pdf|py|sh|db)' \\\n  $AGENTS/*/ $VAULTS/*/*/ 2>/dev/null | sort -u > /tmp/vk-links.txt\n```\n\nFor each unique reference:\n\n1. Normalize `sandbox://workspace/X` \u2192 `~/X`.\n2. Check the target file exists (`test -f`). Anchors (`#section`) are stripped before the check; a missing anchor is noted but not a dead link.\n3. Every missing target is a dead link: record `source file | line number | referenced path | status`.\n\n```bash\n# Find the source files/lines for one dead target (repeat per target):\ngrep -rn \"<dead-target>\" $AGENTS/*/ $VAULTS/*/*/ 2>/dev/null\n```\n\nDead-link triage: if exactly one existing file unambiguously matches the intent (e.g., a renamed file, an obvious typo), it is a SAFE fix (see \u00a76). If the intended target is ambiguous, the link goes to the change list as PROPOSED with `RISK: ambiguous target` \u2014 never guess.",
+  "est_tokens": 213
+ },
+ {
+  "id": "vault-keeper-003",
+  "source": "vault-keeper",
+  "heading": "\u00a73. Contradiction scan",
+  "heading_path": "Vault Keeper \u2014 manual.md > \u00a73. Contradiction scan",
+  "text": "## \u00a73. Contradiction scan\n\nInstance facts must agree across every file that states them. Spot-check \u2014 don't exhaustively re-read; prioritize high-blast-radius facts.\n\nCheck these fact classes wherever two or more files state them:\n\n| Fact class | Examples | Canonical sources to compare |\n|---|---|---|\n| Sender addresses | `contact@chewybits.com`, `contact@revolutionarybusinessmarketing.com`, `[redacted-personal-mailbox]` | agent knowledge.md files, GRAPH.md shared-infra section, MEMORY.md |\n| URLs | Tally intake link, beehiiv links (`elinkcdc`, `elink505`), homepage domains | vault index.md files, GRAPH.md, specialization knowledge.md |\n| Prices/tiers | Stripe tier amounts ($199/$299/$497, $99/$275/$699, etc.) | `your_files/*/stripe-links.json`, funnel vaults, rbm-funnel-operator knowledge.md |\n| Cadences | cron schedules (06:00 daily, 15 min, hourly), 48h SLA | README.md vault index, GRAPH.md, cron job bodies |\n| Counts | node/edge counts, vault counts, feed counts | GRAPH.md header vs filesystem (\u00a71) |\n\nFor each conflict: quote **both** locations verbatim (file path + the exact lines), state the conflict in one sentence, and mark PROPOSED \u2014 never pick a winner. Conflicts touching money, senders, or brand identity are listed first with `RISK: brand/money`.",
+  "est_tokens": 226
+ },
+ {
+  "id": "vault-keeper-004",
+  "source": "vault-keeper",
+  "heading": "\u00a74. Staleness scan",
+  "heading_path": "Vault Keeper \u2014 manual.md > \u00a74. Staleness scan",
+  "text": "## \u00a74. Staleness scan\n\n```bash\n# Files describing current state but untouched for a while:\nfind $AGENTS $VAULTS -name \"*.md\" -mtime +30 | sort\n```\n\nFor each file older than 30 days:\n\n1. Read it (or its dated sections). Flag only entries that describe *current* state \u2014 schedules, prices, \"as of\" claims, active campaigns, open incidents.\n2. Historical records (learnings.md lines, dated logs, decision records) are **not** staleness \u2014 they are history by design. Never flag them.\n3. Each stale current-state entry goes to the change list as PROPOSED: `path \u2014 \"claims X as current (last touched YYYY-MM-DD); verify still true\"`.\n\nIf nothing is stale, report `STALENESS: none` \u2014 that is a finding of \"checked, clean\", not a skipped step.",
+  "est_tokens": 156
+ },
+ {
+  "id": "vault-keeper-005",
+  "source": "vault-keeper",
+  "heading": "\u00a75. GRAPH.md sync",
+  "heading_path": "Vault Keeper \u2014 manual.md > \u00a75. GRAPH.md sync",
+  "text": "## \u00a75. GRAPH.md sync\n\nAfter \u00a71\u2013\u00a74, compute the ground-truth numbers from the filesystem:\n\n1. Agent vault count, split baseline vs specialized (a vault is a *baseline* only if at least one other vault names it as its baseline in README.md's specialization table or its own knowledge.md; otherwise it is specialized).\n2. Business aspect-vault count (expect 28: 4 businesses \u00d7 7 aspects).\n3. Verify GRAPH.md's header sentence and both edge tables against these counts.\n\nThen:\n\n- **Pure arithmetic deltas** (a new vault landed on disk, a table row is simply missing, a count is off by the exact number of new dirs): SAFE \u2014 update the counts and add the missing row(s), then re-verify.\n- **Semantic questions** (is this new directory *supposed* to be a vault? does it belong in the graph? should a new edge exist?): PROPOSED to Aaryn with `RISK: graph semantics`.\n- Never edit GRAPH.md's Hard Rules section or edge-rule prose as a safe fix \u2014 that text is doctrine, not data.",
+  "est_tokens": 213
+ },
+ {
+  "id": "vault-keeper-006",
+  "source": "vault-keeper",
+  "heading": "\u00a76. The change list",
+  "heading_path": "Vault Keeper \u2014 manual.md > \u00a76. The change list",
+  "text": "## \u00a76. The change list\n\nRank every finding into exactly two buckets:\n\n**APPLIED (safe \u2014 the keeper may do these directly):**\n- Dead-link path correction to a file that unambiguously exists (typo, rename, moved file with one obvious destination).\n- Count/table updates in GRAPH.md or README.md that are purely arithmetic and match the filesystem (\u00a75).\n- Whitespace or formatting repairs that change no meaning.\n\nAfter each applied fix, re-run the relevant check (link exists, count matches) before marking it `APPLIED`.\n\n**PROPOSED (needs Aaryn \u2014 the keeper never does these):**\n- Renames, merges, deletions, new vaults, or any directory-structure change.\n- Brand-boundary issues (content, senders, lists, or assets leaking across ChewyBits/RBM/ChewyBlocks/Centuries in Ink).\n- Contradictions with no clear winner (\u00a73) \u2014 quoted, both sides.\n- Stale current-state entries (\u00a74).\n- Ambiguous dead links where the intended target isn't certain.\n- Any edit to doctrine prose (GRAPH.md rules, README.md conventions, PROMPT_TEMPLATE.md).\n\nChange-list entry format: `<path> \u2014 <what/why, one line> \u2014 RISK: <safe|structural|brand/money|ambiguous|graph-semantics> \u2014 <APPLIED|PROPOSED>`.",
+  "est_tokens": 211
+ },
+ {
+  "id": "vault-keeper-007",
+  "source": "vault-keeper",
+  "heading": "\u00a77. Close the run",
+  "heading_path": "Vault Keeper \u2014 manual.md > \u00a77. Close the run",
+  "text": "## \u00a77. Close the run\n\n1. Write `state/last-sweep.txt`:\n```\nlast_sweep: <YYYY-MM-DD>\nagent_vaults_on_disk: <N> (README lists <n>, GRAPH claims <m>)\naspect_vaults_on_disk: <M> (GRAPH claims <m2>)\ndead_links: <k> found, <j> fixed, <k-j> open\ncontradictions: <c> open\nstale_entries: <s> open\nopen_items:\n- <path> \u2014 <one-line status, carried from this or prior sweeps>\n```\n2. Append exactly one line to `learnings.md` in the header's format.\n3. Deliver the report per prompt.md \u00a76.",
+  "est_tokens": 88
+ },
+ {
+  "id": "vault-keeper-008",
+  "source": "vault-keeper",
+  "heading": "\u00a78. Backtest promotion loop (operator-model sharpening)",
+  "heading_path": "Vault Keeper \u2014 manual.md > \u00a78. Backtest promotion loop (operator-model sharpening)",
+  "text": "## \u00a78. Backtest promotion loop (operator-model sharpening)\n\n`learnings.md` files are the backtesting dataset \u2014 every run is a trial. This procedure promotes patterns that repeatedly work into agents' `## 9. World-class operator model` sections, and prunes patterns that fail. Run this after \u00a71\u2013\u00a76, before \u00a77.\n\n1. **Read learnings across agent vaults.** Collect every `learnings.md` line under `~/agents/*/`. Normalize each into: (agent, date, what changed, what was observed, lesson claimed).\n2. **Identify candidate patterns.** A pattern = the same lesson claimed across **\u22653 corroborating runs** (same agent across runs, or the same lesson across different agents). Group near-duplicates; keep the count and the run dates.\n3. **Validate against outcomes.** For each candidate, check the runs it came from: did the pattern precede *good* runs (clean output, no rework, Aaryn approved, no failure-class hit)? A pattern with \u22653 corroborations but mixed outcomes is NOT promoted \u2014 it is reported as inconclusive. A pattern tied to failed runs is pruned: note it in the report, never promote it.\n4. **Propose the promotion as a diff.** Write the exact proposed text as a diff against the target agent's `## 9` section \u2014 which verb it sharpens, the old bullet(s), the new bullet(s). One diff per pattern. Also propose prunes the same way (pattern \u2192 removal, with the failing runs cited).\n5. **Aaryn approves promotions.** The keeper NEVER rewrites another agent's prompt unilaterally. All promotion/prune diffs go into the change list as `RISK: structural` + `PROPOSED`, with the corroborating run count and dates quoted. On approval, apply the diff, log it in BUILD_LOG.md, and note the promotion in the agent's `learnings.md` header format.\n6. **Record the loop.** In `state/last-sweep.txt`, add: `backtest: <p> patterns reviewed, <q> promoted (approved), <r> pruned, <s> inconclusive`.",
+  "est_tokens": 372
+ },
+ {
+  "id": "vault-keeper-009",
+  "source": "vault-keeper",
+  "heading": "\u00a78. Backtest promotion loop (operator-model sharpening)",
+  "heading_path": "Vault Keeper \u2014 manual.md > \u00a78. Backtest promotion loop (operator-model sharpening)",
+  "text": "## \u00a78. Backtest promotion loop (operator-model sharpening)\n\nFailure classes for this section: **<3 corroborations** \u2192 not a pattern, skip silently (not an open item). **Pattern contradicts a hard boundary** \u2192 never promote; escalate as contradiction (\u00a73). **Pattern would change an output contract** \u2192 PROPOSED with `RISK: structural`, Aaryn decides.",
+  "est_tokens": 64
+ },
+ {
+  "id": "vault-keeper-010",
+  "source": "vault-keeper",
+  "heading": "\u00a79. Feedback-as-compass (Aaryn's feedback \u2192 learnings, daily)",
+  "heading_path": "Vault Keeper \u2014 manual.md > \u00a79. Feedback-as-compass (Aaryn's feedback \u2192 learnings, daily)",
+  "text": "## \u00a79. Feedback-as-compass (Aaryn's feedback \u2192 learnings, daily)\n\nAaryn's feedback is the compass for the whole improvement loop. During the daily improvement sweep (and any manual sweep), best-effort:\n\n1. **Collect prior-day feedback.** Review the sweep run's available context (run handoff, conversation summary, any Aaryn messages in scope) for direct feedback: corrections, rejections, approvals with caveats, new rules, \"don't do X\" / \"always do Y\".\n2. **Map each item to its owning vault.** Feedback about an agent's domain \u2192 that agent's `learnings.md`. Feedback about doctrine/voice \u2192 the relevant business `brand/` vault + the agent vault. Feedback about the machine itself \u2192 `vault-keeper/learnings.md`.\n3. **Log it.** Append one dated line per item in the target vault's header format: `2026-10-02 \u2014 Aaryn feedback: <what he said, quoted or faithfully paraphrased> / <what changed as a result> / <what the next run should know>`.\n4. **Ambiguous ownership** \u2192 log to `vault-keeper/learnings.md` and carry as an open item in the sweep report. Never guess the owning vault; never drop the feedback.\n5. **Do not edit MEMORY.md.** Observations about the day go to `~/memory/YYYY-MM-DD.md` only if the sweep is explicitly asked to keep a diary; the default is vault learnings only.",
+  "est_tokens": 254
+ },
+ {
+  "id": "vault-keeper-011",
+  "source": "vault-keeper",
+  "heading": "Failure classes (quick reference)",
+  "heading_path": "Vault Keeper \u2014 manual.md > Failure classes (quick reference)",
+  "text": "## Failure classes (quick reference)\n\n- **File unreadable** \u2192 log path + error in the report, continue the sweep, carry as open item. Never skip silently.\n- **Conflicting sources, no clear winner** \u2192 quote both, PROPOSED, never pick.\n- **Ambiguous dead-link target** \u2192 PROPOSED with `RISK: ambiguous target`, never guess.\n- **Finding touches money/senders/brand** \u2192 same handling, top of the change list, `RISK: brand/money`.\n- **Safe fix would change meaning** \u2192 reclassify as PROPOSED.",
+  "est_tokens": 96
+ },
+ {
+  "id": "rbm-funnel-operator-000",
+  "source": "rbm-funnel-operator",
+  "heading": "RBM Funnel Operator \u2014 manual.md",
+  "heading_path": "RBM Funnel Operator \u2014 manual.md",
+  "text": "# RBM Funnel Operator \u2014 manual.md\n\nNumbered, executable top-to-bottom. Branch decisions explicit. If this manual and `prompt.md` disagree, this manual wins on procedure; `prompt.md` wins on boundaries.",
+  "est_tokens": 35
+ },
+ {
+  "id": "rbm-funnel-operator-001",
+  "source": "rbm-funnel-operator",
+  "heading": "0. Pre-read",
+  "heading_path": "RBM Funnel Operator \u2014 manual.md > 0. Pre-read",
+  "text": "## 0. Pre-read\n\n1. Read `~/agents/rbm-funnel-operator/prompt.md` (this file's contract).\n2. Read `~/agents/rbm-funnel-operator/knowledge.md` (funnel map, tiers, rules).\n3. Read the last line of `~/agents/rbm-funnel-operator/learnings.md` (what the previous run knew).\n\nState directories used this run (read-only except where noted):\n- Watcher runtime state: `~/your_files/rbm-operations/fulfillment/state/` (orders.db, stripe_watermark.txt, alerts.log, cron.log)\n- This vault's scratch: `~/agents/rbm-funnel-operator/state/`",
+  "est_tokens": 66
+ },
+ {
+  "id": "rbm-funnel-operator-002",
+  "source": "rbm-funnel-operator",
+  "heading": "1. Stage check \u2014 INTAKE (Tally)",
+  "heading_path": "RBM Funnel Operator \u2014 manual.md > 1. Stage check \u2014 INTAKE (Tally)",
+  "text": "## 1. Stage check \u2014 INTAKE (Tally)\n\nExact form: `https://tally.so/r/EkyPaL`.\n```bash\ncurl -s -o /dev/null -w \"intake_http=%{http_code} redirect=%{redirect_url}\\n\" -L --max-time 30 https://tally.so/r/EkyPaL\n```\n- **200 and serves the form** \u2192 stage HEALTHY. Evidence: HTTP 200, form title recognizable.\n- **Non-200 / timeout / DNS failure** \u2192 failure class `intake form unreachable`. Record exact code/error. Stage = DEGRADED \u2192 go to \u00a76.\n- **Redirect target changed** (lands somewhere other than the $199 Stripe link `https://buy.stripe.com/00w00i473fBb5D78PGcIE0c`) \u2192 DEGRADED: funnel order intact but the payment hand-off moved. Note old vs new target in evidence \u2192 \u00a76.\n- Do NOT submit the form (a submit creates a real intake row + owner email). Reading the page is the check.\n- Also verify the owner-notification path exists: no way to check Tally's self-notify toggle via curl \u2014 mark notification path as UNVERIFIABLE from here; the morning-brief Gmail check covers it. Note it in evidence.",
+  "est_tokens": 194
+ },
+ {
+  "id": "rbm-funnel-operator-003",
+  "source": "rbm-funnel-operator",
+  "heading": "2. Stage check \u2014 PAYMENT (Stripe links, LIVEMODE, read-only)",
+  "heading_path": "RBM Funnel Operator \u2014 manual.md > 2. Stage check \u2014 PAYMENT (Stripe links, LIVEMODE, read-only)",
+  "text": "## 2. Stage check \u2014 PAYMENT (Stripe links, LIVEMODE, read-only)\n\nSource of truth for link URLs: `~/your_files/rbm-operations/stripe-links.json` (8 RBM entries \u2014 never hardcode URLs from memory).\n```bash\npython3 - <<'EOF'\nimport json, subprocess\nlinks = json.load(open('~/your_files/rbm-operations/stripe-links.json'))\nfor l in links:\n    r = subprocess.run(['curl','-s','-o','/dev/null','-w','%{http_code}',\n                        '--max-time','30','-L',l['url']],\n                       capture_output=True, text=True)\n    print(f\"{r.stdout}  {l['name']}\")\nEOF\n```\n- **All 8 return 200** \u2192 stage HEALTHY. Evidence: `8/8 links HTTP 200`.\n- **Any non-200** \u2192 failure class `payment link returns non-200`. Record the exact URL, name, and code. Finish checking the rest (do not stop early), then stage = DEGRADED \u2192 \u00a76.\n- **Forbidden actions, always:** no test charge, no checkout completion, no `--data` POST to Stripe, no refunds, no link create/modify. Reading the checkout page via GET is the entire check. The controlled $199 purchase test is Aaryn-only (his card, his participation) \u2014 this operator verifies pre/post state, never executes.\n- Stripe API rate limit (429) mid-check \u2192 stop payment checks, stage = UNVERIFIABLE, note in evidence, resume next run.",
+  "est_tokens": 212
+ },
+ {
+  "id": "rbm-funnel-operator-004",
+  "source": "rbm-funnel-operator",
+  "heading": "3. Stage check \u2014 FULFILLMENT (watchers + order queue)",
+  "heading_path": "RBM Funnel Operator \u2014 manual.md > 3. Stage check \u2014 FULFILLMENT (watchers + order queue)",
+  "text": "## 3. Stage check \u2014 FULFILLMENT (watchers + order queue)\n\n```bash\nFUL=~/your_files/rbm-operations/fulfillment\ntail -20 \"$FUL/state/cron.log\"                       # last watcher runs\necho \"--- alerts:\"; tail -10 \"$FUL/state/alerts.log\" 2>/dev/null || echo \"(no alerts.log \u2014 zero alerts)\"\ncat \"$FUL/state/stripe_watermark.txt\"\nsqlite3 \"$FUL/state/orders.db\" \"SELECT id,email,tier,state,datetime(due_time,'unixepoch') FROM orders WHERE state NOT IN ('delivered','refunded') ORDER BY due_time;\" 2>/dev/null || echo \"(orders.db unreadable)\"\ncd \"$FUL\" && python3 tracker.py review 2>&1 | tail -15\n```\nInterpretation:\n- **payment-watch** (hourly) recent in cron.log, exit 0, watermark advancing \u2192 healthy detection path.\n- **deadline-watch** (hourly) recent, exit 0 \u2192 healthy deadline path. (Memory note: per 2026-09-30 the crons were \"ready to install \u2014 NOT installed yet\"; as of 2026-10-02 cron.log shows both running \u2014 if cron.log goes stale, verify the crons actually exist with `crontab -l` before declaring them dead. A missing cron entry = DEGRADED with evidence.)\n- **orders.db:** expected-absence = 0 rows \u2192 \"no open orders,\" HEALTHY, not an error.\n- **review queue** (`tracker.py review`): any row with `duplicate-payment`, `payment-without-intake`, or amount-mismatch \u2192 stage DEGRADED (unmatched payments exist) \u2192 \u00a76 with the exact queue entries as evidence.\n- **orders due \u226412h or overdue** \u2192 DEGRADED with order #, hours left/overdue \u2192 \u00a76 (the proposal must note the 48h clock and whether the [redacted \u2014 internal SLA term] refund path applies \u2014 the refund itself is executed by the fulfillment SOP, never by this operator).\n- **Script error** (stderr, nonzero exit, traceback) \u2192 failure class `fulfillment script error`. One `--dry-run` retry permitted where supported (`poll_payments.py --dry-run`); a second failure ends the attempt. Stage = DEGRADED \u2192 \u00a76 with the captured output.",
+  "est_tokens": 338
+ },
+ {
+  "id": "rbm-funnel-operator-005",
+  "source": "rbm-funnel-operator",
+  "heading": "4. Stage check \u2014 DELIVERY (SOP readiness)",
+  "heading_path": "RBM Funnel Operator \u2014 manual.md > 4. Stage check \u2014 DELIVERY (SOP readiness)",
+  "text": "## 4. Stage check \u2014 DELIVERY (SOP readiness)\n\nThis stage is document-readiness, not live sending:\n1. Confirm `~/your_files/rbm-operations/fulfillment/delivery-email-sop.md` and `deliverable-checklist.md` are unchanged since last known-good (use `md5sum`; record hashes in `state/last-hashes.txt` on first healthy run, diff on later runs). A changed SOP without Aaryn's decision = DEGRADED \u2192 \u00a76.\n2. Confirm every delivered order in `orders.db` has a delivery record (`record-delivery` timestamp) \u2014 delivered orders without records = DEGRADED \u2192 \u00a76.\n3. If any order is `late`/overdue-undelivered: the late-delivery email variant + [redacted \u2014 internal SLA term] refund path must fire per `refund-late-delivery-sop.md` \u2014 flag in the report; execution belongs to the fulfillment SOP, this operator only verifies it was logged.",
+  "est_tokens": 144
+ },
+ {
+  "id": "rbm-funnel-operator-006",
+  "source": "rbm-funnel-operator",
+  "heading": "5. Cross-check with the goal backlog (when goal-owned)",
+  "heading_path": "RBM Funnel Operator \u2014 manual.md > 5. Cross-check with the goal backlog (when goal-owned)",
+  "text": "## 5. Cross-check with the goal backlog (when goal-owned)\n\nIf this run is goal-owned (income goal):\n1. Read the revenue-backlog section of `~/goals/<income-goal>/hidden_files/morning-brief-state.md`.\n2. Map each backlog item to a funnel stage (e.g. \"build + publish RBM teardown offer page\" \u2192 intake; \"$199 purchase test\" \u2192 payment). Note any backlog item whose funnel stage is currently DEGRADED or UNVERIFIABLE.\n3. Write any goal-owned notes/logs under the goal's `hidden_files/` \u2014 never `files/` or `your_files/`.",
+  "est_tokens": 95
+ },
+ {
+  "id": "rbm-funnel-operator-007",
+  "source": "rbm-funnel-operator",
+  "heading": "6. Degradation \u2192 proposal (never a fix)",
+  "heading_path": "RBM Funnel Operator \u2014 manual.md > 6. Degradation \u2192 proposal (never a fix)",
+  "text": "## 6. Degradation \u2192 proposal (never a fix)\n\nFor each DEGRADED stage, write one proposal file:\n`~/agents/rbm-funnel-operator/state/proposal-YYYY-MM-DD-HHMM.md`\ncontaining exactly these fields:\n```\nSTAGE: [intake|payment|fulfillment|delivery]\nOBSERVED: [what the check returned \u2014 verbatim evidence]\nCHANGE: [the proposed change \u2014 concrete, scoped]\nWHY: [why this fixes it, and what breaks if nothing is done]\nEXPECTED EFFECT: [measurable outcome, e.g. \"checkout page loads for all 8 tiers again\"]\nROLLBACK: [how to undo it, step by step]\nNEEDS AARYN: [the exact ask: decision / click / card / login / approval of the change]\n```\nRules:\n- The proposal may describe executing the fix \u2014 the operator does not execute it. Proposing is the action.\n- If the fix touches Stripe LIVEMODE, the Tally form, DNS, or fulfillment scripts: say so explicitly under NEEDS AARYN (\"live-system change \u2014 your approval required\").\n- If Aaryn's reply is ambiguous, treat it as NOT APPROVED.\n- Keep past proposals in `state/` (append-only history); never delete one.",
+  "est_tokens": 205
+ },
+ {
+  "id": "rbm-funnel-operator-008",
+  "source": "rbm-funnel-operator",
+  "heading": "7. Assemble the report",
+  "heading_path": "RBM Funnel Operator \u2014 manual.md > 7. Assemble the report",
+  "text": "## 7. Assemble the report\n\nEmit the report per `prompt.md` \u00a76 output contract (verbatim template). Four stages each with status / evidence / risk, then one proposal block per degraded stage (change / why / expected effect / rollback / needs Aaryn). If all HEALTHY: the one-line silent report.\n\n## 8. Close the run\n\nAppend exactly one line to `~/agents/rbm-funnel-operator/learnings.md`:\n`YYYY-MM-DD | <one line: what changed, what was observed, what the next run should know>`\nNewest last (append at end). Never edit existing lines.",
+  "est_tokens": 109
+ },
+ {
+  "id": "rbm-funnel-operator-009",
+  "source": "rbm-funnel-operator",
+  "heading": "Branch decision summary",
+  "heading_path": "RBM Funnel Operator \u2014 manual.md > Branch decision summary",
+  "text": "## Branch decision summary\n\n| Condition | Stage verdict | Then |\n|---|---|---|\n| Tally 200, redirect \u2192 $199 link | INTAKE HEALTHY | continue to \u00a72 |\n| Tally non-200/timeout/DNS | INTAKE DEGRADED (`intake form unreachable`) | \u00a76 proposal \u2192 \u00a77 |\n| Tally redirect target moved | INTAKE DEGRADED | \u00a76 proposal \u2192 \u00a77 |\n| 8/8 Stripe links 200 | PAYMENT HEALTHY | continue to \u00a73 |\n| \u22651 link non-200 | PAYMENT DEGRADED (`payment link returns non-200`) | finish all links, \u00a76 \u2192 \u00a77 |\n| Stripe 429 | PAYMENT UNVERIFIABLE | note, resume next run |\n| Watchers fresh + exit 0, 0 open orders, review queue empty | FULFILLMENT HEALTHY | continue to \u00a74 |\n| Review queue has rows | FULFILLMENT DEGRADED (unmatched payments) | \u00a76 proposal \u2192 \u00a77 |\n| Orders due \u226412h / overdue | FULFILLMENT DEGRADED | \u00a76 (note SLA/refund path) \u2192 \u00a77 |\n| Script error | FULFILLMENT DEGRADED (`fulfillment script error`) | one --dry-run retry, then \u00a76 \u2192 \u00a77 |\n| SOPs hashed-stable, deliveries recorded | DELIVERY HEALTHY | \u00a77 silent/full report |\n| SOP changed w/o decision, or deliveries unrecorded | DELIVERY DEGRADED | \u00a76 proposal \u2192 \u00a77 |\n| Ambiguous approval from Aaryn | \u2014 | treat as NOT APPROVED, note in report |\n\n---",
+  "est_tokens": 285
+ },
+ {
+  "id": "rbm-funnel-operator-010",
+  "source": "rbm-funnel-operator",
+  "heading": "\u00a78. Intake/checkout wiring SPECS \u2014 Missed-Call Rescue + Review Engine (approved 2026-10-02 \u2014 staging only)",
+  "heading_path": "RBM Funnel Operator \u2014 manual.md > \u00a78. Intake/checkout wiring SPECS \u2014 Missed-Call Rescue + Review Engine (approved 2026-10-02 \u2014 staging only)",
+  "text": "## \u00a78. Intake/checkout wiring SPECS \u2014 Missed-Call Rescue + Review Engine (approved 2026-10-02 \u2014 staging only)\n\nSPECS ONLY. No live links, no live systems touched. These specs are what Aaryn approves before anything is built; building happens under a separate explicit approval.",
+  "est_tokens": 55
+ },
+ {
+  "id": "rbm-funnel-operator-011",
+  "source": "rbm-funnel-operator",
+  "heading": "Missed-Call Rescue ([redacted \u2014 unreleased offer pricing])",
+  "heading_path": "RBM Funnel Operator \u2014 manual.md > \u00a78. Intake/checkout wiring SPECS \u2014 Missed-Call Rescue + Review Engine (approved 2026-10-02 \u2014 staging only) > Missed-Call Rescue ([redacted \u2014 unreleased offer pricing])",
+  "text": "### Missed-Call Rescue ([redacted \u2014 unreleased offer pricing])\n\n- **Tally intake fields:** business name \u00b7 owner name + mobile \u00b7 business phone number(s) to cover \u00b7 primary call windows (hours) \u00b7 services offered (for call-script routing) \u00b7 CRM/booking tool in use (\"none\" is a valid answer) \u00b7 \"what happens to a missed call today?\" (free text \u2014 the pain baseline) \u00b7 consent checkbox (required): \"RBM may text/call this number to operate the service\" \u2014 feeds the A2P compliance checklist in `~/vaults/rbm/legal/`.\n- **Stripe tier mapping:** one-time [redacted] \"setup\" price + recurring [redacted] subscription; subscription starts at setup completion (not at signup); proration off; no trial (staging default \u2014 Aaryn may change at build approval).",
+  "est_tokens": 148
+ },
+ {
+  "id": "rbm-funnel-operator-012",
+  "source": "rbm-funnel-operator",
+  "heading": "Review Engine ([redacted \u2014 unreleased offer pricing])",
+  "heading_path": "RBM Funnel Operator \u2014 manual.md > \u00a78. Intake/checkout wiring SPECS \u2014 Missed-Call Rescue + Review Engine (approved 2026-10-02 \u2014 staging only) > Review Engine ([redacted \u2014 unreleased offer pricing])",
+  "text": "### Review Engine ([redacted \u2014 unreleased offer pricing])\n\n- **Tally intake fields:** business name \u00b7 owner name + email \u00b7 Google Business Profile URL \u00b7 primary review platforms (GBP + up to 2 more) \u00b7 current review count + rating (self-reported; verified at onboarding) \u00b7 response voice notes (tone guidance, topics to never touch publicly) \u00b7 escalation contact for sensitive reviews \u00b7 consent checkbox (required): \"RBM may draft and, after owner approval, post review responses on our behalf\" \u2014 sensitive responses ALWAYS get human review before anything sends (see newsletter-operator \u00a79).\n- **Stripe tier mapping:** one-time [redacted] \"setup\" price + recurring [redacted] subscription; subscription starts at the first review-request cycle; proration off.\n- **HARD compliance note (mirrors the legal vault):** intake copy must NEVER promise, imply, or reward reviews \u2014 no \"leave us 5 stars for X\", no review gating, no fake reviews. Any intake draft containing incentive language is a hard fail at QA.",
+  "est_tokens": 202
+ },
+ {
+  "id": "rbm-funnel-operator-013",
+  "source": "rbm-funnel-operator",
+  "heading": "Shared spec rules",
+  "heading_path": "RBM Funnel Operator \u2014 manual.md > \u00a78. Intake/checkout wiring SPECS \u2014 Missed-Call Rescue + Review Engine (approved 2026-10-02 \u2014 staging only) > Shared spec rules",
+  "text": "### Shared spec rules\n\n- Tally confirmation copy follows the teardown pattern: \"Your <product> onboarding begins once your payment is confirmed.\"\n- Both products: intake-first funnel (same as teardown \u2014 DECISION 2026-09-30); the clock starts at CONFIRMED PAYMENT.\n- Watcher integration: payment-watch covers these SKUs at the same cadence as the teardown links once live; deadline-watch SLAs per product spec (rescue: coverage go-live SLA; engine: first-cycle SLA) \u2014 defined at build approval, not here.",
+  "est_tokens": 96
+ }
+]

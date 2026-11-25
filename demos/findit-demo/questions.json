@@ -1,0 +1,55 @@
+[
+ {
+  "q": "a gift for my dad who just got into winter hiking",
+  "gold": {
+   "guide-01": "The gift guide is written for exactly this shopper \u2014 someone buying for a new winter hiker \u2014 and names specific gifts.",
+   "prod-26": "Microspikes are the guide's first-named gift and the classic under-$70 winter hiking present: useful on every icy trail."
+  }
+ },
+ {
+  "q": "something to keep a beginner kayaker safe under $100",
+  "gold": {
+   "prod-16": "The adult life vest is the safety-first purchase for a new kayaker, Coast Guard-approved and $74.95 \u2014 inside the $100 budget.",
+   "guide-02": "The beginner kayaking guide puts the life vest first, before paddle or boat, for exactly this reason."
+  }
+ },
+ {
+  "q": "our toddler's first camping trip",
+  "gold": {
+   "prod-07": "The family tent is built for this: standing room, a room divider so little ones can sleep early, and space for a pack-and-play.",
+   "guide-04": "The first camping kit checklist covers camping with little kids specifically \u2014 extra blankets, a headlamp each, simple food."
+  }
+ },
+ {
+  "q": "boots for wide feet that won't ache on long rocky descents",
+  "gold": {
+   "prod-02": "The Summit boots are built on a wide last with extra cushioning aimed at exactly the forefoot ache of long rocky descents."
+  }
+ },
+ {
+  "q": "a warm layer for sitting around camp at night, not for moving in",
+  "gold": {
+   "prod-20": "The Northwall jacket is explicitly built for the stopped hours \u2014 belays and camp evenings \u2014 and described as over-warm for hiking uphill."
+  }
+ },
+ {
+  "q": "lightweight kit for a solo backpacker counting every ounce",
+  "gold": {
+   "prod-06": "The Solstice is a 1 lb 14 oz solo shelter pitched with trekking poles, written for gram-counters.",
+   "prod-10": "The Drift quilt is the other half of the ultralight sleep system at just over a pound, aimed at thru-hikers and gram-counters."
+  }
+ },
+ {
+  "q": "staying dry through days of rain on the trail",
+  "gold": {
+   "prod-22": "The Stormline shell is a three-layer waterproof built for multi-day rain, not parking-lot showers.",
+   "prod-23": "The matching rain pants are described as the other half of staying dry on multi-day treks."
+  }
+ },
+ {
+  "q": "a fast-boiling stove for coffee on cold mornings",
+  "gold": {
+   "prod-29": "The Jetstream boils a liter in about three minutes and is framed around camp coffee before the tent comes down."
+  }
+ }
+]
